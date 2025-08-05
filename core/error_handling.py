@@ -22,7 +22,10 @@ class MCPErrorType(Enum):
 
 
 class MCPError(Exception):
-    """Base exception for MCP-related errors."""
+    """
+    Base exception for MCP-related errors with comprehensive error handling,
+    retry logic, circuit breakers, and monitoring capabilities.
+    """
     
     def __init__(self, message: str, error_type: MCPErrorType = MCPErrorType.UNKNOWN_ERROR, 
                  mcp_name: str = None, tool_name: str = None, original_error: Exception = None):

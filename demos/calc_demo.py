@@ -19,18 +19,18 @@ async def main():
     # Path to our calculator MCP
     calc_mcp_path = Path(__file__).parent / "mcp_calc_server.py"
     
-    print("🚀 Starting any-mcp demo with calculator MCP...")
-    print(f"📁 MCP Path: {calc_mcp_path}")
+    print("Starting any-mcp demo with calculator MCP...")
+    print(f"MCP Path: {calc_mcp_path}")
     print()
     
     async with AnyMCP(str(calc_mcp_path)) as calc:
         # Discover available tools
         tools = calc.list_tools()
-        print(f"🔍 Discovered tools: {tools}")
+        print(f"Discovered tools: {tools}")
         print()
         
         # Demo some calculations
-        print("🧮 Running calculations...")
+        print("Running calculations...")
         
         # Addition
         result = await calc.call_tool("add", a=5, b=3)
@@ -49,8 +49,8 @@ async def main():
         print(f"15 ÷ 3 = {result}")
         
         print()
-        print("✅ Demo completed successfully!")
-        print("🎯 any-mcp successfully started the MCP, discovered tools, and executed calculations!")
+        print("Demo completed successfully!")
+        print("any-mcp successfully started the MCP, discovered tools, and executed calculations!")
 
 
 if __name__ == "__main__":

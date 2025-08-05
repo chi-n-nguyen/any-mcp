@@ -33,6 +33,10 @@ class MCPConfig:
 
 
 class MCPInstaller:
+    """
+    Multi-source MCP package installer supporting Docker, local files, and registry.
+    Provides YAML-based configuration management and environment variable support.
+    """
     def __init__(self, config_path: str = "mcp_config.yaml"):
         self.config_path = Path(config_path)
         self.mcps_dir = Path("mcps")

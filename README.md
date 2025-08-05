@@ -20,12 +20,14 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 
 ### Core Components
 
-1. **MCP Installer** - Install and manage MCP packages from multiple sources
-2. **MCP Manager** - Lifecycle management, health monitoring, and tool orchestration
-3. **MCP Client** - Enhanced client with full tool discovery and calling capabilities
-4. **Web API** - FastAPI-based HTTP interface for all MCP operations
-5. **Error Handling** - Comprehensive error handling with circuit breakers and retries
-6. **Configuration System** - YAML-based configuration with environment variable support
+1. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and registry with YAML-based configuration management
+2. **MCP Manager** (`mcp_manager.py`) - Lifecycle management, health monitoring, and tool orchestration for multiple MCP servers
+3. **MCP Client** (`mcp_client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
+4. **Web API** (`api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
+5. **Error Handling** (`core/error_handling.py`) - Comprehensive error handling with circuit breakers, retries, and error aggregation
+6. **CLI Interface** (`core/cli.py`, `core/cli_chat.py`) - Interactive command-line interface for MCP management and chat
+7. **Claude Integration** (`core/claude.py`) - Direct integration with Anthropic's Claude API for LLM interactions
+8. **Tool Management** (`core/tools.py`) - Centralized tool discovery and management across all MCPs
 
 ## Quick Start
 
@@ -211,15 +213,15 @@ When running the web API, visit:
 ```
 mcp/
 ├── api/                    # Web API implementation
-│   ├── web_mcp.py         # FastAPI application
+│   ├── web_mcp.py         # FastAPI application with RESTful endpoints
 │   └── __init__.py
 ├── core/                   # Core functionality
-│   ├── chat.py            # Chat interface
-│   ├── claude.py          # Claude integration
+│   ├── chat.py            # Chat interface for LLM interactions
+│   ├── claude.py          # Claude API integration
 │   ├── cli_chat.py        # CLI chat implementation
 │   ├── cli.py             # Command line interface
-│   ├── tools.py           # Tool management
-│   └── error_handling.py  # Error handling system
+│   ├── tools.py           # Tool management and discovery
+│   └── error_handling.py  # Error handling system with circuit breakers
 ├── demos/                  # Example MCPs and demos
 │   ├── calc_demo.py       # Calculator demo
 │   ├── github_mcp_demo.py # GitHub MCP demo
@@ -227,9 +229,9 @@ mcp/
 │   ├── real_github_demo.py # Real GitHub integration
 │   └── simple_demo.py     # Basic demonstration
 ├── mcps/                   # Installed local MCPs
-├── mcp_client.py          # Enhanced MCP client
-├── mcp_installer.py       # MCP installation system
-├── mcp_manager.py         # MCP lifecycle management
+├── mcp_client.py          # Enhanced MCP client with tool discovery
+├── mcp_installer.py       # Multi-source MCP installation system
+├── mcp_manager.py         # MCP lifecycle management and orchestration
 ├── mcp_server.py          # Document MCP server
 ├── main.py                # Main application entry point
 ├── example_mcp_config.yaml # Example configuration
@@ -291,13 +293,13 @@ curl http://localhost:8000/mcp
 
 ## Roadmap
 
-### Week 3 Goals
+### Upcoming Features
 - **MCP Discovery Registry**: Searchable registry of available MCPs
 - **Enhanced LLM Integration**: Direct integration with various LLM frameworks
 - **Real-time WebSocket API**: Streaming tool execution results
 - **Domain-specific MCPs**: Financial data, document processing, database MCPs
 
-### Week 4 Goals
+### Future Enhancements
 - **Production Dashboard**: Web-based monitoring and management interface
 - **Advanced Authentication**: Role-based access control for MCPs
 - **Performance Optimization**: Caching, connection pooling, load balancing

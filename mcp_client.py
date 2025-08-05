@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class MCPClient:
+    """
+    Enhanced MCP client with complete tool discovery and calling capabilities.
+    Provides robust error handling and logging for production use.
+    """
     def __init__(
         self,
         command: str,

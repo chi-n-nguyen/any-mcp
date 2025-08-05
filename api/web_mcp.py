@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
 # Create FastAPI app
 app = FastAPI(
     title="MCP Web API",
-    description="Web API for managing and calling MCP tools",
+    description="RESTful HTTP interface for managing and calling MCP tools",
     version="1.0.0",
     lifespan=lifespan
 )

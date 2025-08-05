@@ -1,0 +1,10 @@
+{
+  "exclude": ["dist/*", ".venv/*", "__pycache__/*", "*.pyc", "*.pyo", "*.pyd", ".pytest_cache/*", ".mypy_cache/*"],
+  "formatOnSave": true,
+  "defaultFormatter": "ruff",
+  "python.defaultInterpreterPath": "./.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+  "python.linting.enabled": true,
+  "python.linting.ruffEnabled": true
+} 

@@ -12,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class MCPManager:
+    """
+    MCP lifecycle manager for starting, stopping, and monitoring MCP servers.
+    Provides health checks, tool orchestration, and status reporting.
+    """
     def __init__(self, config_path: str = "mcp_config.yaml"):
         self.installer = MCPInstaller(config_path)
         self.active_clients: Dict[str, MCPClient] = {}

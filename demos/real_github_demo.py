@@ -23,11 +23,11 @@ class RealGitHubMCP:
     async def start(self):
         """Start the real GitHub MCP server."""
         if not self.github_token:
-            print("⚠️  No GitHub token found. Set GITHUB_TOKEN environment variable.")
+            print("WARNING: No GitHub token found. Set GITHUB_TOKEN environment variable.")
             print("   Using mock mode for demo purposes.")
             return await self._start_mock()
             
-        print("🚀 Starting real GitHub MCP server...")
+        print("Starting real GitHub MCP server...")
         
         # Start the GitHub MCP server via Docker
         cmd = [
@@ -52,13 +52,13 @@ class RealGitHubMCP:
             await self._discover_tools()
             
         except Exception as e:
-            print(f"❌ Failed to start GitHub MCP server: {e}")
-            print("🔄 Falling back to mock mode...")
+            print(f"ERROR: Failed to start GitHub MCP server: {e}")
+            print("Falling back to mock mode...")
             return await self._start_mock()
     
     async def _start_mock(self):
         """Start mock mode for demo purposes."""
-        print("🎭 Running in mock mode (no real GitHub API calls)")
+        print("Running in mock mode (no real GitHub API calls)")
         
         # Mock the real GitHub MCP tools based on documentation
         self.tools = {
@@ -117,7 +117,7 @@ class RealGitHubMCP:
             "search_code": "Search code using GitHub's code search API"
         }
         
-        print(f"🔍 Discovered {len(self.tools)} GitHub tools (mock mode)")
+        print(f"Discovered {len(self.tools)} GitHub tools (mock mode)")
     
     async def _discover_tools(self):
         """Discover available tools from the GitHub MCP server."""
@@ -145,13 +145,13 @@ class RealGitHubMCP:
             if "result" in response_data:
                 self.tools = {tool["name"]: tool["description"] 
                              for tool in response_data["result"]["tools"]}
-                print(f"🔍 Discovered {len(self.tools)} real GitHub tools!")
+                print(f"Discovered {len(self.tools)} real GitHub tools!")
             else:
-                print("⚠️  Failed to discover tools, using mock data")
+                print("WARNING: Failed to discover tools, using mock data")
                 await self._start_mock()
                 
         except Exception as e:
-            print(f"❌ Error discovering tools: {e}")
+            print(f"ERROR: Error discovering tools: {e}")
             await self._start_mock()
     
     def list_tools(self) -> List[str]:
@@ -167,7 +167,7 @@ class RealGitHubMCP:
         if tool_name not in self.tools:
             raise ValueError(f"Tool '{tool_name}' not found. Available: {list(self.tools.keys())}")
         
-        print(f"🛠️ Calling {tool_name} with args: {kwargs}")
+        print(f"Calling {tool_name} with args: {kwargs}")
         
         if not self.process:
             # Mock mode - return realistic data
@@ -201,7 +201,7 @@ class RealGitHubMCP:
                 raise Exception("Invalid response from MCP server")
                 
         except Exception as e:
-            print(f"❌ Error calling tool {tool_name}: {e}")
+            print(f"ERROR: Error calling tool {tool_name}: {e}")
             return await self._mock_tool_call(tool_name, kwargs)
     
     async def _mock_tool_call(self, tool_name: str, args: Dict) -> Any:
@@ -239,7 +239,7 @@ class RealGitHubMCP:
         if self.process:
             self.process.terminate()
             await self.process.wait()
-            print("🛑 Stopped GitHub MCP server")
+            print("Stopped GitHub MCP server")
     
     async def __aenter__(self):
         await self.start()
@@ -252,13 +252,13 @@ class RealGitHubMCP:
 async def main():
     """Demo the real GitHub MCP integration."""
     
-    print("🎯 Real GitHub MCP Demo")
+    print("Real GitHub MCP Demo")
     print("=" * 50)
     
     async with RealGitHubMCP() as github:
         # Show all discovered tools
         tools = github.list_tools()
-        print(f"\n📋 Discovered {len(tools)} GitHub tools:")
+        print(f"\nDiscovered {len(tools)} GitHub tools:")
         
         # Group tools by category
         categories = {
@@ -274,34 +274,34 @@ async def main():
         
         for category, category_tools in categories.items():
             if category_tools:
-                print(f"\n🔹 {category} ({len(category_tools)} tools):")
+                print(f"\n{category} ({len(category_tools)} tools):")
                 for tool in category_tools[:5]:  # Show first 5 per category
                     desc = github.get_tool_description(tool)
                     print(f"   • {tool}: {desc}")
                 if len(category_tools) > 5:
                     print(f"   ... and {len(category_tools) - 5} more")
         
-        print(f"\n🧮 Total: {len(tools)} tools available!")
+        print(f"\nTotal: {len(tools)} tools available!")
         
         # Demo some real operations
-        print(f"\n🚀 Demo operations:")
+        print(f"\nDemo operations:")
         
         # Search repositories
         result = await github.call_tool("search_repositories", 
                                       query="mcp language:python stars:>100")
-        print(f"🔍 Found {len(result.get('items', []))} MCP repositories")
+        print(f"Found {len(result.get('items', []))} MCP repositories")
         
         # Get user info
         result = await github.call_tool("get_user", username="github")
-        print(f"👤 GitHub user: {result.get('login', 'Unknown')} ({result.get('type', 'Unknown')})")
+        print(f"GitHub user: {result.get('login', 'Unknown')} ({result.get('type', 'Unknown')})")
         
         # Search issues
         result = await github.call_tool("search_issues", 
                                       query="mcp is:open")
-        print(f"🐛 Found {len(result.get('items', []))} open MCP issues")
+        print(f"Found {len(result.get('items', []))} open MCP issues")
     
-    print("\n✅ Real GitHub MCP demo completed!")
-    print("🎯 any-mcp successfully discovered and used real GitHub MCP tools!")
+    print("\nReal GitHub MCP demo completed!")
+    print("any-mcp successfully discovered and used real GitHub MCP tools!")
 
 
 if __name__ == "__main__":

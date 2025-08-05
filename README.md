@@ -289,7 +289,20 @@ curl http://localhost:8000/mcp/github/health
 curl http://localhost:8000/mcp
 ```
 
-## Roadmap
+## Development Timeline
+
+### Week 1: Foundation
+- **Core MCP Adapter**: Universal interface for any MCP package
+- **Auto-Discovery**: Automatic tool detection and cataloging
+- **Basic Demos**: GitHub, Calculator, and Document MCPs working
+- **Simple CLI**: Command-line interface for MCP interaction
+
+### Week 2: Production Infrastructure  
+- **MCP Installer**: Multi-source installation (Docker, local, registry)
+- **MCP Manager**: Lifecycle management and health monitoring
+- **Web API**: FastAPI-based HTTP interface for all operations
+- **Error Handling**: Retries, circuit breakers, comprehensive error management
+- **Configuration**: YAML-based config with environment variable support
 
 ### Week 3 Goals
 - **MCP Discovery Registry**: Searchable registry of available MCPs

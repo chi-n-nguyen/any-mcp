@@ -217,7 +217,7 @@ async def demo_error_handling():
 
 async def main():
     """Run the complete Week 2 demonstration."""
-    print("🎯 any-mcp Week 2 Implementation Demo")
+    print("any-mcp Week 2 Implementation Demo")
     print("Showcasing: Installer, Manager, Web API, Error Handling")
     print("="*60)
     
@@ -235,23 +235,23 @@ async def main():
         await demo_error_handling()
         
         print("\n" + "="*60)
-        print("✅ Week 2 Demo Completed Successfully!")
+        print("Week 2 Demo Completed Successfully!")
         print("="*60)
         print("\nKey Achievements:")
-        print("✅ MCP Installer: Install from Docker, local files, registry")
-        print("✅ MCP Manager: Lifecycle management, health monitoring")
-        print("✅ Enhanced MCP Client: Full tool discovery and calling")
-        print("✅ Web API: RESTful interface for all operations")
-        print("✅ Error Handling: Retries, circuit breakers, monitoring")
-        print("✅ Configuration: YAML-based with environment variables")
-        print("✅ Production Ready: Logging, cleanup, health checks")
+        print("• MCP Installer: Install from Docker, local files, registry")
+        print("• MCP Manager: Lifecycle management, health monitoring")
+        print("• Enhanced MCP Client: Full tool discovery and calling")
+        print("• Web API: RESTful interface for all operations")
+        print("• Error Handling: Retries, circuit breakers, monitoring")
+        print("• Configuration: YAML-based with environment variables")
+        print("• Production Ready: Logging, cleanup, health checks")
         
         print("\nNext: Week 3 will add MCP registry, enhanced LLM integration,")
         print("and real-time capabilities!")
         
     except Exception as e:
         logger.error(f"Demo failed: {e}")
-        print("\n❌ Demo encountered an error. Check logs for details.")
+        print("\nDemo encountered an error. Check logs for details.")
 
 
 if __name__ == "__main__":

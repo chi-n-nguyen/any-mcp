@@ -18,7 +18,7 @@ class AnyMCP:
         
     async def start(self):
         """Start the MCP and discover tools."""
-        print(f"🚀 Starting MCP: {self.mcp_config}")
+        print(f"Starting MCP: {self.mcp_config}")
         
         # Mock tool discovery
         if "github" in str(self.mcp_config).lower():
@@ -34,7 +34,7 @@ class AnyMCP:
                 "edit_document": "Edit document content"
             }
         
-        print(f"🔍 Discovered {len(self.tools)} tools")
+        print(f"Discovered {len(self.tools)} tools")
         return self
         
     def list_tools(self):
@@ -46,7 +46,7 @@ class AnyMCP:
         if tool_name not in self.tools:
             raise ValueError(f"Tool '{tool_name}' not found")
             
-        print(f"🛠️ Calling {tool_name} with args: {kwargs}")
+        print(f"Calling {tool_name} with args: {kwargs}")
         
         # Mock results
         if tool_name == "search_repositories":
@@ -70,7 +70,7 @@ class AnyMCP:
             
     async def stop(self):
         """Stop the MCP."""
-        print("🛑 Stopping MCP")
+        print("Stopping MCP")
         
     async def __aenter__(self):
         await self.start()
@@ -83,7 +83,7 @@ class AnyMCP:
 async def main():
     """Demo any-mcp with GitHub MCP."""
     
-    print("🎯 any-mcp Demo: Universal MCP Adapter")
+    print("any-mcp Demo: Universal MCP Adapter")
     print("=" * 50)
     
     # Demo with GitHub MCP
@@ -94,19 +94,19 @@ async def main():
     }
     
     async with AnyMCP(github_config) as github:
-        print(f"\n📋 Available tools: {github.list_tools()}")
+        print(f"\nAvailable tools: {github.list_tools()}")
         
         # Search repositories
         result = await github.call_tool("search_repositories", 
                                       query="mcp language:python")
-        print(f"🔍 Found {len(result['items'])} MCP repositories")
+        print(f"Found {len(result['items'])} MCP repositories")
         
         # Get user info
         result = await github.call_tool("get_user", username="github")
-        print(f"👤 GitHub user: {result['login']}")
+        print(f"GitHub user: {result['login']}")
     
-    print("\n✅ Demo completed!")
-    print("🎯 any-mcp successfully started GitHub's MCP and executed operations!")
+    print("\nDemo completed!")
+    print("any-mcp successfully started GitHub's MCP and executed operations!")
 
 
 if __name__ == "__main__":

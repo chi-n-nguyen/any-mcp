@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced main.py that uses MCPManager for Nathan's final destination workflow.
+Enhanced main.py that uses MCPManager for the final destination workflow.
 This integrates MCP discovery, installation, and LLM tool registration.
 """
 
@@ -31,7 +31,7 @@ assert anthropic_api_key, (
 
 async def call_mcp(args):
     """
-    Nathan's call_mcp function - demonstrates direct MCP calling.
+    Call MCP function - demonstrates direct MCP calling.
     This is equivalent to: call_mcp(args)
     """
     manager = MCPManager()
@@ -57,17 +57,17 @@ async def call_mcp(args):
 
 def push_tool(args):
     """
-    Nathan's push_tool function - represents getting tools from MCP.
+    Push tool function - represents getting tools from MCP.
     This is equivalent to: from mcp.github import push_tool; push_tool(args)
     """
     print(f"push_tool called with args: {args}")
-    # In Nathan's vision, this would return the actual tool function
+    # This would return the actual tool function
     # that can be registered with the LLM
     return "github_tool_function"
 
 
 class LLMRegistry:
-    """Represents Nathan's llm.register interface."""
+    """Represents the llm.register interface."""
     
     def __init__(self, claude_service):
         self.claude_service = claude_service
@@ -80,19 +80,19 @@ class LLMRegistry:
         return tool_func
 
 
-async def nathan_main_workflow():
+async def main_workflow():
     """
-    Nathan's exact workflow:
+    The exact workflow:
     def main():
         call_mcp(args)
         from mcp.github import push_tool
         push_tool(args)  
         llm.register.tool(push_tool)
     """
-    print("🎯 Executing Nathan's Main Workflow")
+    print("🎯 Executing Main Workflow")
     print("=" * 40)
     
-    # Nathan's args
+    # Example args
     args = {"query": "mcp language:python", "sort": "stars"}
     
     # Step 1: call_mcp(args)
@@ -113,15 +113,15 @@ async def nathan_main_workflow():
     llm_registry.tool(github_tool)
     print(f"   Registered {len(llm_registry.registered_tools)} tools with LLM\n")
     
-    print("✅ Nathan's workflow completed successfully!")
+    print("✅ Workflow completed successfully!")
 
 
 async def main():
-    """Enhanced main that supports both old CLI mode and Nathan's workflow."""
+    """Enhanced main that supports both old CLI mode and the workflow demo."""
     
-    # Check if we should run Nathan's workflow demo
-    if "--nathan-demo" in sys.argv:
-        await nathan_main_workflow()
+    # Check if we should run the workflow demo
+    if "--demo" in sys.argv:
+        await main_workflow()
         return
     
     # Otherwise, run the enhanced CLI with MCP Manager
@@ -172,11 +172,11 @@ async def main():
             emoji = "✅" if info["active"] and info["healthy"] else "❌"
             print(f"   {emoji} {name}: {info['description']}")
         
-        if "--nathan-demo" not in sys.argv:
+        if "--demo" not in sys.argv:
             print("\n💡 Tips:")
             print("   • All MCP tools are automatically available to Claude")
             print("   • Type your queries naturally - Claude will use appropriate tools")
-            print("   • Use --nathan-demo flag to see Nathan's workflow demo")
+            print("   • Use --demo flag to see the workflow demo")
             print("   • MCPs are configured in mcp_config.yaml")
         
         await cli.run()

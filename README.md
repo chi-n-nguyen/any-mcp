@@ -18,6 +18,55 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 
 ## Architecture
 
+```mermaid
+graph TD
+    subgraph "User Layer"
+        A[User Query] --> B[CLI/Web API]
+    end
+    
+    subgraph "AI Engine"
+        B --> C[Claude LLM]
+        C --> D[ToolManager]
+    end
+    
+    subgraph "MCP Layer"
+        D --> E[MCPManager]
+        E --> F[GitHub MCP]
+        E --> G[Calculator MCP]
+        E --> H[Documents MCP]
+        E --> I[Any MCP...]
+    end
+    
+    subgraph "Sources"
+        F --> J[Docker Image]
+        G --> K[Local Script]
+        H --> L[Local Server]
+        I --> M[Registry/Custom]
+    end
+    
+    subgraph "External APIs"
+        J --> N[GitHub API]
+        K --> O[Math Operations]
+        L --> P[File System]
+        M --> Q[Any API]
+    end
+    
+    %% Config
+    R[mcp_config.yaml] --> E
+    
+    %% Flow
+    C -.->|Auto-registers tools| D
+    D -.->|Routes calls| E
+    
+    %% Styling
+    style C fill:#e1f5fe
+    style E fill:#e8f5e8
+    style J fill:#fff3e0
+    style K fill:#fff3e0
+    style L fill:#fff3e0
+    style M fill:#fff3e0
+```
+
 ### Core Components
 
 1. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and registry with YAML-based configuration management

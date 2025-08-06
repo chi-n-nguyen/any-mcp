@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Nathan's Final Destination Demo
-===============================
+Final Destination Demo
+======================
 
-This demonstrates the exact workflow Nathan described:
+This demonstrates the complete MCP workflow:
 1. Find an MCP (GitHub MCP)
 2. Install it in our repo
 3. Import it into our program
@@ -24,7 +24,7 @@ from core.chat import Chat
 from core.tools import ToolManager
 
 class FinalDestinationDemo:
-    """Demonstrates Nathan's complete MCP workflow."""
+    """Demonstrates the complete MCP workflow."""
     
     def __init__(self):
         self.installer = MCPInstaller()
@@ -192,14 +192,14 @@ class FinalDestinationDemo:
 
 async def main():
     """
-    Nathan's Final Destination:
+    Final Destination:
     def main():
         call_mcp(args)
         from mcp.github import push_tool
         push_tool(args)
         llm.register.tool(push_tool)
     """
-    print("🚀 Nathan's Final Destination Demo")
+    print("🚀 Final Destination Demo")
     print("=" * 50)
     print("Demonstrating the complete MCP workflow:")
     print("  1. Find an MCP")

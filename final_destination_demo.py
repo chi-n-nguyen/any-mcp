@@ -116,7 +116,7 @@ class FinalDestinationDemo:
             args = {"query": "mcp language:python", "sort": "stars"}
             
         try:
-            # This is equivalent to Nathan's call_mcp(args)
+            # This is equivalent to call_mcp(args)
             result = await self.manager.call_mcp(
                 "github",
                 "search_repositories", 
@@ -216,22 +216,22 @@ async def main():
             await demo.setup()
             await stack.enter_async_context(demo.manager)
             
-            # Execute Nathan's workflow
+            # Execute the workflow
             await demo.step1_find_mcp()
             await demo.step2_install_mcp()
             await demo.step3_import_into_program()
             
-            # This is Nathan's call_mcp(args)
+            # This is call_mcp(args)
             args = {"query": "mcp language:python stars:>10"}
             await demo.step4_call_mcp_directly(args)
             
-            # This is Nathan's llm.register.tool(push_tool)
+            # This is llm.register.tool(push_tool)
             all_tools, mcp_clients = await demo.step5_register_with_llm()
             
             # Demonstrate LLM using the tools
             await demo.step6_llm_calls_tools(mcp_clients)
             
-            print("\n🎉 SUCCESS! We've reached Nathan's final destination!")
+            print("\n🎉 SUCCESS! We've reached the final destination!")
             print("\n📋 Summary:")
             print("  ✅ Found GitHub MCP")
             print("  ✅ Installed it via our installer")

@@ -8,12 +8,13 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 
 ## Key Features
 
+- **Natural Language Interface**: Talk to any MCP using plain English - no API knowledge needed
 - **Universal Adapter**: One interface for all MCPs regardless of underlying implementation
 - **Auto-Discovery**: Automatically detect and catalog available tools from any MCP
-- **Multi-Source Installation**: Install MCPs from Docker, local files, or registry
+- **Multi-Source Installation**: Install MCPs from Docker, local files, or registry modules
+- **Polished CLI**: Modern command-line interface with subcommands for all operations
 - **Web API**: RESTful interface for remote MCP management and tool calling
-- **Robust Error Handling**: Comprehensive error handling with retries and circuit breakers
-- **Health Monitoring**: Real-time health checks and status monitoring
+- **Claude Integration**: Optional LLM-powered chat mode for advanced natural language processing
 - **Production Ready**: Includes configuration management, logging, and cleanup
 
 ## Architecture
@@ -21,62 +22,67 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 ```mermaid
 graph TD
     subgraph "User Layer"
-        A[User Query] --> B[CLI/Web API]
+        A[Natural Language] --> B[any-mcp-cli]
+        A2[Tool Calls] --> B
+        A3[Web Requests] --> C[Web API]
     end
     
-    subgraph "AI Engine"
-        B --> C[Claude LLM]
-        C --> D[ToolManager]
+    subgraph "Interface Layer"
+        B --> D[NL Parser]
+        B --> E[Tool Router]
+        C --> E
+        D --> F[Fuzzy Matcher]
+        F --> E
+    end
+    
+    subgraph "AI Engine (Optional)"
+        G[Claude LLM] --> D
+        G --> H[ToolManager]
     end
     
     subgraph "MCP Layer"
-        D --> E[MCPManager]
-        E --> F[GitHub MCP]
-        E --> G[Calculator MCP]
-        E --> H[Documents MCP]
-        E --> I[Any MCP...]
+        E --> I[MCPManager]
+        H --> I
+        I --> J[Git MCP]
+        I --> K[Filesystem MCP]
+        I --> L[GitHub MCP]
+        I --> M[Any MCP...]
     end
     
     subgraph "Sources"
-        F --> J[Docker Image]
-        G --> K[Local Script]
-        H --> L[Local Server]
-        I --> M[Registry/Custom]
+        J --> N[Python Module]
+        K --> O[Docker Image]
+        L --> P[Local Script]
+        M --> Q[Registry/Custom]
     end
     
-    subgraph "External APIs"
-        J --> N[GitHub API]
-        K --> O[Math Operations]
-        L --> P[File System]
-        M --> Q[Any API]
+    subgraph "External Services"
+        N --> R[Git Operations]
+        O --> S[File System]
+        P --> T[GitHub API]
+        Q --> U[Any API]
     end
     
     %% Config
-    R[mcp_config.yaml] --> E
-    
-    %% Flow
-    C -.->|Auto-registers tools| D
-    D -.->|Routes calls| E
+    V[mcp_config.yaml] --> I
     
     %% Styling
-    style C fill:#e1f5fe
-    style E fill:#e8f5e8
-    style J fill:#fff3e0
-    style K fill:#fff3e0
-    style L fill:#fff3e0
-    style M fill:#fff3e0
+    style B fill:#e1f5fe
+    style D fill:#f3e5f5
+    style G fill:#e8f5e8
+    style I fill:#fff3e0
 ```
 
 ### Core Components
 
-1. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and registry with YAML-based configuration management
+1. **Natural Language CLI** (`any_mcp_cli.py`) - Polished command-line interface with natural language processing for one-shot tool calls
 2. **MCP Manager** (`mcp_manager.py`) - Lifecycle management, health monitoring, and tool orchestration for multiple MCP servers
 3. **MCP Client** (`mcp_client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
-4. **Web API** (`api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
-5. **Error Handling** (`core/error_handling.py`) - Comprehensive error handling with circuit breakers, retries, and error aggregation
-6. **CLI Interface** (`core/cli.py`, `core/cli_chat.py`) - Interactive command-line interface for MCP management and chat
-7. **Claude Integration** (`core/claude.py`) - Direct integration with Anthropic's Claude API for LLM interactions
-8. **Tool Management** (`core/tools.py`) - Centralized tool discovery and management across all MCPs
+4. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and Python modules
+5. **Web API** (`api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
+6. **Claude Integration** (`core/claude.py`) - Optional LLM integration for advanced natural language processing and chat
+7. **Tool Management** (`core/tools.py`) - Centralized tool discovery and management across all MCPs
+8. **Connection Router** (`connect_server.py`) - Flexible server connection interface for various MCP sources
 
 ## Quick Start
 
@@ -96,17 +102,40 @@ export USE_UV=1  # Use uv for faster Python execution
 
 ### Basic Usage
 
-#### 1. Command Line Interface
+#### 1. Natural Language CLI (Recommended)
 
 ```bash
-# Run the enhanced CLI with multiple MCPs
-python main.py
+# One-shot natural language tool call (local MCP)
+python any_mcp_cli.py nl --script mcp_server.py --query "read the plan: doc_id=plan.md"
 
-# Or run with specific MCP servers
-python main.py demos/mcp_calc_server.py
+# Call external MCP with natural language
+python any_mcp_cli.py nl --module mcp_server_git --module-args "--repository ." --query "show git status repo_path=."
+
+# Explicit tool calls
+python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
+python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
+
+# Interactive chat (requires Claude API key)
+python any_mcp_cli.py chat --script mcp_server.py
 ```
 
-#### 2. Web API Server
+#### 2. Server Management
+
+```bash
+# List configured servers
+python any_mcp_cli.py list
+
+# Install and configure MCPs
+python any_mcp_cli.py install --name docs --source local://mcp_server.py --desc "Document operations"
+python any_mcp_cli.py install --name git --source docker://git-mcp-image --desc "Git operations"
+
+# Start/stop servers
+python any_mcp_cli.py start --server docs
+python any_mcp_cli.py tools --server docs
+python any_mcp_cli.py stop --server docs
+```
+
+#### 3. Web API Server
 
 ```bash
 # Start the web API server
@@ -116,7 +145,7 @@ python -m api.web_mcp
 uvicorn api.web_mcp:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-#### 3. Programmatic Usage
+#### 4. Programmatic Usage
 
 ```python
 from mcp_manager import MCPManager
@@ -193,49 +222,69 @@ installed_mcps:
 
 ## Supported MCP Sources
 
+### Python Module MCPs
+```bash
+# Use Python modules directly (recommended for community MCPs)
+python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
+python any_mcp_cli.py nl --module mcp_server_filesystem --query "list files path=/tmp"
+```
+
 ### Docker MCPs
 ```bash
 # Install from Docker registry
-installer.install_mcp(
-    "github",
-    "docker://ghcr.io/github/github-mcp-server"
-)
+python any_mcp_cli.py install --name github --source docker://ghcr.io/github/github-mcp-server
+python any_mcp_cli.py call --docker ghcr.io/github/github-mcp-server --tool search_repos --args query=python
 ```
 
-### Local MCPs
+### Local Script MCPs
 ```bash
-# Install from local file
-installer.install_mcp(
-    "calculator",
-    "local://./demos/mcp_calc_server.py"
-)
+# Use local Python scripts
+python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
+python any_mcp_cli.py nl --script custom_mcp.py --query "process data: input=test.csv"
 ```
 
 ### Registry MCPs (Future)
 ```bash
 # Install from MCP registry (planned)
-installer.install_mcp(
-    "financial",
-    "registry://financial-data-mcp"
-)
+python any_mcp_cli.py install --name financial --source registry://financial-data-mcp
 ```
 
-## Demo Scripts
+## Examples and Demos
 
-Run the included demonstrations:
+### Quick Start Examples
 
 ```bash
-# Simple conceptual demo
-python demos/simple_demo.py
+# Natural language with local MCP
+python any_mcp_cli.py nl --script mcp_server.py --query "read the plan: doc_id=plan.md"
 
-# Real GitHub MCP integration
-python demos/real_github_demo.py
+# External Git MCP operations
+python -m pip install mcp-server-git
+python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
 
-# Calculator MCP demo
-python demos/calc_demo.py
+# Community filesystem MCP
+python -m pip install mcp-server-filesystem  
+python any_mcp_cli.py nl --module mcp_server_filesystem --query "list directory contents path=."
 
-# Basic GitHub MCP demo
-python demos/github_mcp_demo.py
+# Docker-based MCP (when available)
+python any_mcp_cli.py call --docker mcp/calculator --tool add --args a=5,b=3
+```
+
+### Available Community MCPs
+
+Install and use any MCP from the [official servers repository](https://github.com/modelcontextprotocol/servers):
+
+```bash
+# Git operations
+pip install mcp-server-git
+python any_mcp_cli.py call --module mcp_server_git --tool git_log --args repo_path=.
+
+# Filesystem operations  
+pip install mcp-server-filesystem
+python any_mcp_cli.py call --module mcp_server_filesystem --tool read_file --args path=README.md
+
+# Database operations
+pip install mcp-server-sqlite
+python any_mcp_cli.py call --module mcp_server_sqlite --tool execute_query --args query="SELECT * FROM users"
 ```
 
 ## Error Handling and Resilience

@@ -1,0 +1,3 @@
+[console_scripts]
+any-mcp = main:main
+mcp-server = api.web_mcp:main

@@ -298,6 +298,16 @@ async def main():
         action="store_true", 
         help="Don't start interactive session, just connect and show info"
     )
+
+    parser.add_argument(
+        "--call",
+        help="Call a specific tool by name once and print the result"
+    )
+
+    parser.add_argument(
+        "--call-args",
+        help="Comma-separated key=value pairs for tool arguments (e.g., key1=val1,key2=val2)"
+    )
     
     args = parser.parse_args()
     
@@ -353,6 +363,28 @@ async def main():
         # Show server info if requested or if in no-chat mode
         if args.info or args.no_chat:
             await connector.show_server_info()
+
+        # One-shot tool call (non-interactive proof)
+        if args.call:
+            tool_args: dict[str, str] = {}
+            if args.call_args:
+                try:
+                    for pair in args.call_args.split(','):
+                        if '=' in pair:
+                            k, v = pair.split('=', 1)
+                            tool_args[k.strip()] = v.strip()
+                except Exception:
+                    print("❌ Invalid --call-args format. Use key=value,key2=value2")
+                    return
+
+            try:
+                result = await connector.client.call_tool(args.call, tool_args)
+                if result is None:
+                    print("❌ Tool call failed")
+                else:
+                    print(f"✅ Tool call succeeded: {result}")
+            except Exception as e:
+                print(f"❌ Tool call error: {e}")
         
         # Start interactive session unless disabled
         if not args.no_chat:

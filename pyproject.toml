@@ -77,6 +77,7 @@ docs = [
 [project.scripts]
 any-mcp = "main:main"
 mcp-server = "api.web_mcp:main"
+any-mcp-cli = "any_mcp_cli:main"
 
 [project.urls]
 Homepage = "https://github.com/ai-dscubed/any-mcp"

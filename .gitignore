@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# OS files
+.DS_Store
+
+# Env files
+.env
+.env.*
+
+# IDE
+.idea/
+.vscode/
+
+# Demos (cleanup)
+/demos/
+/interactive_demo.py
+/random_mcp_demo.py
+/demo_features.py
+/run_tools.py
+/final_destination_demo.py
+/main_with_mcp_manager.py

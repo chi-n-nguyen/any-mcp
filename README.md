@@ -1,8 +1,5 @@
 # any-mcp
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/chi-n-nguyen/any-mcp/releases/tag/v1.0.0)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 A universal adapter that safely starts any MCP package, discovers available tools, and provides a unified interface for users and LLMs to interact with them through a single, standardized API.
 
 > **First Production Release v1.0.0** - Ready for LLMgine integration with full MCP protocol compliance, multi-LLM support, and production-ready deployment.

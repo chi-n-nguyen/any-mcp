@@ -269,6 +269,10 @@ python any_mcp_cli.py nl --module mcp_server_filesystem --query "list directory 
 
 # Docker-based MCP (when available)
 python any_mcp_cli.py call --docker mcp/calculator --tool add --args a=5,b=3
+
+# Notion workspace queries
+python any_mcp_cli.py nl --script notion_mcp_server.py --query "What are my high priority tasks?"
+python any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=all
 ```
 
 ### Available Community MCPs
@@ -287,6 +291,10 @@ python any_mcp_cli.py call --module mcp_server_filesystem --tool read_file --arg
 # Database operations
 pip install mcp-server-sqlite
 python any_mcp_cli.py call --module mcp_server_sqlite --tool execute_query --args query="SELECT * FROM users"
+
+# Notion workspace integration (included)
+python any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=in_progress
+python any_mcp_cli.py nl --script notion_mcp_server.py --query "Show me my course notes"
 ```
 
 ## Error Handling and Resilience
@@ -334,6 +342,7 @@ mcp/
 ├── mcp_installer.py       # Multi-source MCP installation system
 ├── mcp_manager.py         # MCP lifecycle management and orchestration
 ├── mcp_server.py          # Document MCP server
+├── notion_mcp_server.py   # Notion workspace integration MCP server
 ├── main.py                # Main application entry point
 ├── example_mcp_config.yaml # Example configuration
 └── README.md              # This file
@@ -379,6 +388,81 @@ RUN pip install -e .
 EXPOSE 8000
 CMD ["uvicorn", "api.web_mcp:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
+
+### Notion Integration Guide
+
+#### Setting Up Notion MCP Server
+
+The project includes a Notion MCP server (`notion_mcp_server.py`) that enables natural language queries to your Notion workspace.
+
+**1. Get Your Notion Integration Key:**
+- Go to [Notion Integrations](https://www.notion.so/my-integrations)
+- Create a new integration and copy the key
+- Share your databases/pages with the integration
+
+**2. Test Direct Tool Calls:**
+```bash
+# Activate virtual environment (if not already active)
+source .venv/bin/activate
+
+# Get all tasks from your Task Tracker
+uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=all
+
+# Get tasks by status
+uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=in_progress
+
+# Get database contents
+uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_database_contents --args database_id=YOUR_DATABASE_ID
+
+# Get specific page content
+uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_page_content --args page_id=YOUR_PAGE_ID
+```
+
+**3. Enable Natural Language Queries:**
+
+Create a `.env` file with your LLM provider:
+```bash
+# For Gemini (recommended - free tier available)
+echo "LLM_PROVIDER=gemini" > .env
+echo "GEMINI_API_KEY=your_gemini_api_key_here" >> .env
+
+# OR for Claude
+echo "LLM_PROVIDER=claude" > .env
+echo "ANTHROPIC_API_KEY=your_anthropic_key_here" >> .env
+```
+
+**4. Use Natural Language Queries:**
+```bash
+# Ask questions in plain English
+uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "What are my high priority tasks due this month?"
+
+uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "Show me all my course notes from COMP20008"
+
+uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "What goals do I have that are marked as done?"
+```
+
+**5. Interactive Chat Mode:**
+```bash
+# Start interactive session with Notion
+uv run python3 any_mcp_cli.py chat --script notion_mcp_server.py
+```
+
+**6. Web API Access:**
+```bash
+# Start web server
+uv run python3 -m api.web_mcp
+
+# Query via HTTP
+curl -X POST http://localhost:8000/mcp/notion/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "get_task_tracker_tasks", "args": {"status_filter": "all"}}'
+```
+
+**Available Notion Tools:**
+- `search_notion` - Search across all accessible content
+- `get_database_contents` - Get contents from a specific database
+- `get_page_content` - Get content of a specific page
+- `get_task_tracker_tasks` - Get tasks with status filtering
 
 ### Health Monitoring
 

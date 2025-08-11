@@ -79,14 +79,14 @@ graph TD
 
 ### Core Components
 
-1. **Natural Language CLI** (`any_mcp_cli.py`) - Polished command-line interface with natural language processing for one-shot tool calls
-2. **MCP Manager** (`mcp_manager.py`) - Lifecycle management, health monitoring, and tool orchestration for multiple MCP servers
-3. **MCP Client** (`mcp_client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
-4. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and Python modules
-5. **Web API** (`api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
-6. **Multi-LLM Integration** (`core/claude.py`, `core/gemini.py`) - Optional LLM integration supporting both Claude and Gemini for advanced natural language processing and chat
-7. **Tool Management** (`core/tools.py`) - Centralized tool discovery and management across all MCPs
-8. **Connection Router** (`connect_server.py`) - Flexible server connection interface for various MCP sources
+1. **Natural Language CLI** (`any_mcp/cli/main.py`) - Polished command-line interface with natural language processing for one-shot tool calls
+2. **MCP Manager** (`any_mcp/managers/manager.py`) - Lifecycle management, health monitoring, and tool orchestration for multiple MCP servers
+3. **MCP Client** (`any_mcp/core/client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
+4. **MCP Installer** (`any_mcp/managers/installer.py`) - Multi-source MCP package installer supporting Docker, local files, and Python modules
+5. **Web API** (`any_mcp/api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
+6. **Multi-LLM Integration** (`any_mcp/core/claude.py`, `any_mcp/core/gemini.py`) - Optional LLM integration supporting both Claude and Gemini for advanced natural language processing and chat
+7. **Tool Management** (`any_mcp/core/tools.py`) - Centralized tool discovery and management across all MCPs
+8. **Connection Router** (`any_mcp/servers/connect_server.py`) - Flexible server connection interface for various MCP sources
 
 ## Quick Start
 
@@ -126,18 +126,14 @@ python main.py
 #### 1. Natural Language CLI (Recommended)
 
 ```bash
-# One-shot natural language tool call (local MCP)
-python any_mcp_cli.py nl --script mcp_server.py --query "read the plan: doc_id=plan.md"
-
-# Call external MCP with natural language
-python any_mcp_cli.py nl --module mcp_server_git --module-args "--repository ." --query "show git status repo_path=."
+# Natural language tool call via configured MCPs
+any-mcp-cli nl --module mcp_server_git --query "show git status repo_path=."
 
 # Explicit tool calls
-python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
-python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
+any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
 
 # Interactive chat (requires Claude or Gemini API key)
-python any_mcp_cli.py chat --script mcp_server.py
+any-mcp-cli chat --module mcp_server_git
 ```
 
 #### 2. Server Management
@@ -160,17 +156,17 @@ python any_mcp_cli.py stop --server docs
 
 ```bash
 # Start the web API server
-python -m api.web_mcp
+python -m any_mcp.api.web_mcp
 
 # Or use uvicorn directly
-uvicorn api.web_mcp:app --host 0.0.0.0 --port 8000 --reload
+uvicorn any_mcp.api.web_mcp:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 #### 4. Programmatic Usage
 
 ```python
-from mcp_manager import MCPManager
-from mcp_installer import MCPInstaller
+from any_mcp.managers.manager import MCPManager
+from any_mcp.managers.installer import MCPInstaller
 
 # Install an MCP
 installer = MCPInstaller()
@@ -246,22 +242,22 @@ installed_mcps:
 ### Python Module MCPs
 ```bash
 # Use Python modules directly (recommended for community MCPs)
-python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
-python any_mcp_cli.py nl --module mcp_server_filesystem --query "list files path=/tmp"
+any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
+any-mcp-cli nl --module mcp_server_filesystem --query "list files path=/tmp"
 ```
 
 ### Docker MCPs
 ```bash
 # Install from Docker registry
-python any_mcp_cli.py install --name github --source docker://ghcr.io/github/github-mcp-server
-python any_mcp_cli.py call --docker ghcr.io/github/github-mcp-server --tool search_repos --args query=python
+any-mcp-cli install --name github --source docker://ghcr.io/github/github-mcp-server
+any-mcp-cli call --docker ghcr.io/github/github-mcp-server --tool search_repos --args query=python
 ```
 
 ### Local Script MCPs
 ```bash
 # Use local Python scripts
-python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
-python any_mcp_cli.py nl --script custom_mcp.py --query "process data: input=test.csv"
+any-mcp-cli call --script my_local_mcp.py --tool read_document --args doc_id=plan.md
+any-mcp-cli nl --script custom_mcp.py --query "process data: input=test.csv"
 ```
 
 ### Registry MCPs (Future)
@@ -275,23 +271,13 @@ python any_mcp_cli.py install --name financial --source registry://financial-dat
 ### Quick Start Examples
 
 ```bash
-# Natural language with local MCP
-python any_mcp_cli.py nl --script mcp_server.py --query "read the plan: doc_id=plan.md"
-
 # External Git MCP operations
 python -m pip install mcp-server-git
-python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
+any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
 
 # Community filesystem MCP
 python -m pip install mcp-server-filesystem  
-python any_mcp_cli.py nl --module mcp_server_filesystem --query "list directory contents path=."
-
-# Docker-based MCP (when available)
-python any_mcp_cli.py call --docker mcp/calculator --tool add --args a=5,b=3
-
-# Notion workspace queries
-python any_mcp_cli.py nl --script notion_mcp_server.py --query "What are my high priority tasks?"
-python any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=all
+any-mcp-cli nl --module mcp_server_filesystem --query "list directory contents path=."
 ```
 
 ### Available Community MCPs
@@ -338,37 +324,31 @@ When running the web API, visit:
 ### Project Structure
 
 ```
-mcp/
-├── api/                    # Web API implementation
-│   ├── web_mcp.py         # FastAPI application with RESTful endpoints
-│   └── __init__.py
-├── core/                   # Core functionality
-│   ├── chat.py            # Chat interface for LLM interactions
-│   ├── claude.py          # Claude API integration
-│   ├── gemini.py          # Gemini API integration
-│   ├── cli_chat.py        # CLI chat implementation
-│   ├── cli.py             # Command line interface
-│   ├── tools.py           # Tool management and discovery
-│   └── error_handling.py  # Error handling system with circuit breakers
-├── demos/                  # Example MCPs and demos
-│   ├── calc_demo.py       # Calculator demo
-│   ├── github_mcp_demo.py # GitHub MCP demo
-│   ├── mcp_calc_server.py # Calculator MCP server
-│   ├── real_github_demo.py # Real GitHub integration
-│   └── simple_demo.py     # Basic demonstration
-├── mcps/                   # Installed local MCPs
-├── mcp_client.py          # Enhanced MCP client with tool discovery
-├── mcp_installer.py       # Multi-source MCP installation system
-├── mcp_manager.py         # MCP lifecycle management and orchestration
-├── mcp_server.py          # Document MCP server
-├── notion_mcp_server.py   # Notion workspace integration MCP server
-├── notion_web_demo.html   # Web interface demo for Notion API
-├── launch_notion_mcp.sh   # LLMGine integration launcher script
-├── main.py                # Main application entry point
-├── example_mcp_config.yaml # Example configuration
-└── README.md              # This file
-└── VERSION                # Version file
-└── LICENSE                # MIT License file
+any_mcp/
+├── any_mcp/
+│   ├── api/               # Web API implementation
+│   │   └── web_mcp.py
+│   ├── core/              # Core functionality
+│   │   ├── chat.py
+│   │   ├── claude.py
+│   │   ├── gemini.py
+│   │   ├── cli_chat.py
+│   │   ├── cli.py
+│   │   ├── tools.py
+│   │   └── error_handling.py
+│   ├── managers/          # MCP lifecycle & installation
+│   │   ├── manager.py
+│   │   └── installer.py
+│   ├── servers/
+│   │   └── connect_server.py
+│   └── cli/
+│       └── main.py
+├── config/
+│   └── mcp_config.yaml
+├── main.py                # Entry point
+├── README.md
+├── LICENSE
+└── VERSION
 ```
 
 ## Release Notes
@@ -450,10 +430,10 @@ COPY . .
 RUN pip install -e .
 
 EXPOSE 8000
-CMD ["uvicorn", "api.web_mcp:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "any_mcp.api.web_mcp:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-### Notion Integration Guide
+<!-- Notion/demo content removed during cleanup to reflect universal MCP usage only -->
 
 #### Setting Up Notion MCP Server
 

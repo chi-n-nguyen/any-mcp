@@ -33,9 +33,7 @@ any-mcp/
 │   │   └── installer.py   # MCP installer (was mcp_installer.py)
 │   ├── servers/           # MCP servers
 │   │   ├── __init__.py
-│   │   ├── mcp_server.py  # Basic MCP server
-│   │   ├── notion_mcp_server.py # Notion integration
-│   │   └── connect_server.py    # Server connector
+│   │   ├── connect_server.py    # Server connector
 │   ├── cli/               # CLI interface
 │   │   ├── __init__.py
 │   │   └── main.py        # CLI main (was any_mcp_cli.py)
@@ -44,10 +42,7 @@ any-mcp/
 ├── config/                # Configuration files
 │   ├── mcp_config.yaml    # MCP configuration
 │   └── example_mcp_config.yaml
-├── examples/              # Example scripts and demos
-│   ├── demos/             # Original demos folder
-│   ├── *.py               # Demo scripts
-│   └── *.html             # Web demos
+├── examples/              # (optional) Example scripts
 ├── tests/                 # Test suite
 │   ├── __init__.py
 │   ├── unit/              # Unit tests

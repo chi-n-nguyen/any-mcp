@@ -58,18 +58,8 @@ async def main():
         for mcp_name, client in mcp_manager.active_clients.items():
             clients[mcp_name] = client
         
-        # Add default document client if no MCPs loaded or for backward compatibility
+        # Optionally start additional server scripts passed via CLI
         server_scripts = sys.argv[1:]
-        if not clients or server_scripts:
-            command, args = (
-                ("uv", ["run", "mcp_server.py"])
-                if os.getenv("USE_UV", "0") == "1"
-                else ("python3", ["mcp_server.py"])
-            )
-            doc_client = await stack.enter_async_context(
-                MCPClient(command=command, args=args)
-            )
-            clients["doc_client"] = doc_client
 
         # Add any additional server scripts from command line
         for i, server_script in enumerate(server_scripts):
@@ -79,8 +69,14 @@ async def main():
             )
             clients[client_id] = client
 
+        # Ensure at least one client is available
+        if not clients:
+            raise RuntimeError(
+                "No MCP clients loaded. Configure MCPs in config/mcp_config.yaml or pass server scripts."
+            )
+
         # Create chat with all clients
-        doc_client = clients.get("doc_client") or list(clients.values())[0]
+        doc_client = next(iter(clients.values()))
         chat = CliChat(
             doc_client=doc_client,
             clients=clients,

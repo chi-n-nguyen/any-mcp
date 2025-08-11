@@ -1,86 +1,11 @@
 installed_mcps:
-  # Add ANY third-party MCP here - engine auto-loads it:
-  
-  notion:
-    type: "local"
-    source: "npx -y @notionhq/notion-mcp-server"
-    description: "Official Notion MCP Server for Notion API operations"
-    env_vars:
-      NOTION_TOKEN: "${NOTION_TOKEN}"
-    enabled: true
-
-  github:
-    type: "docker"
-    source: "ghcr.io/github/github-mcp-server"
-    description: "GitHub's official MCP server for repository operations"
-    env_vars:
-      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
-      GITHUB_TOOLSETS: "all"
-    enabled: false
-
-  calculator:
-    type: "local"
-    source: "./demos/mcp_calc_server.py"
-    description: "Simple calculator MCP for mathematical operations"
-    env_vars: {}
-    enabled: false
-
-  documents:
-    type: "local"
-    source: "./mcp_server.py"
-    description: "Document management MCP for reading and editing documents"
-    env_vars: {}
-    enabled: false
-
-  # Example third-party MCPs you can add:
-  
-  # 1. Filesystem MCP (NPX-based)
-  filesystem:
-    type: "local"
-    source: "npx @modelcontextprotocol/server-filesystem /Users/nhatchi.nguyen"
-    description: "Filesystem operations MCP"
-    env_vars: {}
-    enabled: false  # Set to true to enable
-  
-  # 2. SQLite MCP (NPX-based)
-  sqlite:
-    type: "local"
-    source: "npx @modelcontextprotocol/server-sqlite /path/to/your/database.db"
-    description: "SQLite database operations"
-    env_vars: {}
-    enabled: false  # Set to true to enable
-  
-  # 3. Web Search MCP (NPX-based)
-  search:
-    type: "local"
-    source: "npx @modelcontextprotocol/server-search"
-    description: "Web search capabilities"
-    env_vars:
-      SEARCH_API_KEY: "${SEARCH_API_KEY}"
-    enabled: false  # Set to true to enable
-  
-  # 4. Custom Python MCP
-  my_custom_mcp:
-    type: "local"
-    source: "./path/to/your/custom_mcp_server.py"
-    description: "Your custom MCP server"
-    env_vars:
-      API_KEY: "${YOUR_API_KEY}"
-    enabled: false  # Set to true to enable
-
-  # Custom Notion integration with built-in API key
-  notion_custom:
-    type: "local"
-    source: "./notion_mcp_server.py"
-    description: "Custom Notion MCP server with task tracking and natural language queries"
-    env_vars: {}
-    enabled: true
-  
-  # 5. Docker-based third-party MCP
-  weather_mcp:
-    type: "docker"
-    source: "weather-org/weather-mcp:latest"
-    description: "Weather MCP from third party"
-    env_vars:
-      WEATHER_API_KEY: "${WEATHER_API_KEY}"
-    enabled: false  # Set to true to enable 
+  # Keep only MCPs you actively use. Examples below are commented out.
+  # Enable by setting `enabled: true` and providing required env vars.
+  #
+  # github:
+  #   type: "docker"
+  #   source: "ghcr.io/github/github-mcp-server"
+  #   description: "GitHub's official MCP server"
+  #   env_vars:
+  #     GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+  #   enabled: false

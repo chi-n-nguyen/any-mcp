@@ -344,6 +344,7 @@ mcp/
 ├── mcp_server.py          # Document MCP server
 ├── notion_mcp_server.py   # Notion workspace integration MCP server
 ├── notion_web_demo.html   # Web interface demo for Notion API
+├── launch_notion_mcp.sh   # LLMGine integration launcher script
 ├── main.py                # Main application entry point
 ├── example_mcp_config.yaml # Example configuration
 └── README.md              # This file
@@ -514,6 +515,38 @@ async function getMyTasks() {
 - `get_database_contents` - Get contents from a specific database
 - `get_page_content` - Get content of a specific page
 - `get_task_tracker_tasks` - Get tasks with status filtering
+- `health_check` - Health check for LLMGine integration
+
+### LLMGine Integration
+
+The project is ready for LLMGine integration with standard MCP protocol compliance:
+
+**Quick Setup for LLMGine:**
+```bash
+# Use the launcher script
+./launch_notion_mcp.sh
+
+# Or directly
+python3 notion_mcp_server.py
+```
+
+**LLMGine Configuration:**
+```json
+{
+  "mcpServers": {
+    "notion": {
+      "command": "./launch_notion_mcp.sh",
+      "cwd": "/path/to/any-mcp",
+      "description": "Notion workspace integration with task tracking"
+    }
+  }
+}
+```
+
+**Health Check:**
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"health_check","arguments":{}}}' | python3 notion_mcp_server.py
+```
 
 ### Health Monitoring
 

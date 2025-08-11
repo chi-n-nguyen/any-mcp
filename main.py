@@ -84,7 +84,7 @@ async def main():
         chat = CliChat(
             doc_client=doc_client,
             clients=clients,
-            claude_service=llm_service,
+            llm_service=llm_service,
         )
 
         cli = CliApp(chat)

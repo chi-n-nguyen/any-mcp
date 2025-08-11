@@ -1,9 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from mcp.types import Prompt, PromptMessage
 from anthropic.types import MessageParam
 
 from core.chat import Chat
 from core.claude import Claude
+from core.gemini import Gemini
 from mcp_client import MCPClient
 
 
@@ -12,9 +13,9 @@ class CliChat(Chat):
         self,
         doc_client: MCPClient,
         clients: dict[str, MCPClient],
-        claude_service: Claude,
+        llm_service: Union[Claude, Gemini],
     ):
-        super().__init__(clients=clients, claude_service=claude_service)
+        super().__init__(clients=clients, llm_service=llm_service)
 
         self.doc_client: MCPClient = doc_client
 

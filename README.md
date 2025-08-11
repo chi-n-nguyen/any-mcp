@@ -343,6 +343,7 @@ mcp/
 ├── mcp_manager.py         # MCP lifecycle management and orchestration
 ├── mcp_server.py          # Document MCP server
 ├── notion_mcp_server.py   # Notion workspace integration MCP server
+├── notion_web_demo.html   # Web interface demo for Notion API
 ├── main.py                # Main application entry point
 ├── example_mcp_config.yaml # Example configuration
 └── README.md              # This file
@@ -448,14 +449,64 @@ uv run python3 any_mcp_cli.py chat --script notion_mcp_server.py
 ```
 
 **6. Web API Access:**
+
+Start the web server:
 ```bash
 # Start web server
 uv run python3 -m api.web_mcp
+```
 
-# Query via HTTP
-curl -X POST http://localhost:8000/mcp/notion/call \
+**RESTful API Endpoints:**
+```bash
+# Check API health
+curl http://localhost:8000/health
+
+# List all MCPs
+curl http://localhost:8000/mcp
+
+# List tools for specific MCP
+curl http://localhost:8000/mcp/notion_custom/tools
+
+# Call Notion tools via HTTP
+curl -X POST http://localhost:8000/mcp/notion_custom/call \
   -H "Content-Type: application/json" \
   -d '{"tool_name": "get_task_tracker_tasks", "args": {"status_filter": "all"}}'
+
+# Get high priority tasks
+curl -X POST http://localhost:8000/mcp/notion_custom/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "get_task_tracker_tasks", "args": {"status_filter": "in_progress"}}'
+
+# Query specific database
+curl -X POST http://localhost:8000/mcp/notion_custom/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "get_database_contents", "args": {"database_id": "YOUR_DATABASE_ID"}}'
+
+# Search Notion content
+curl -X POST http://localhost:8000/mcp/notion_custom/call \
+  -H "Content-Type: application/json" \
+  -d '{"tool_name": "search_notion", "args": {"query": "MCP", "filter_type": "page"}}'
+```
+
+**Web Interface Demo:**
+Open `notion_web_demo.html` in your browser for an interactive web interface to test the API.
+
+**JavaScript/Web Integration:**
+```javascript
+// Example web app integration
+async function getMyTasks() {
+    const response = await fetch('http://localhost:8000/mcp/notion_custom/call', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            tool_name: 'get_task_tracker_tasks',
+            args: { status_filter: 'all' }
+        })
+    });
+    const data = await response.json();
+    const tasks = JSON.parse(data.data.content[0].text);
+    return tasks;
+}
 ```
 
 **Available Notion Tools:**

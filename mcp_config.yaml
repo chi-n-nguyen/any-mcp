@@ -67,6 +67,14 @@ installed_mcps:
     env_vars:
       API_KEY: "${YOUR_API_KEY}"
     enabled: false  # Set to true to enable
+
+  # Custom Notion integration with built-in API key
+  notion_custom:
+    type: "local"
+    source: "./notion_mcp_server.py"
+    description: "Custom Notion MCP server with task tracking and natural language queries"
+    env_vars: {}
+    enabled: true
   
   # 5. Docker-based third-party MCP
   weather_mcp:

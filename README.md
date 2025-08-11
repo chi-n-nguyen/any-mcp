@@ -26,67 +26,63 @@ graph TD
     subgraph "User Layer"
         A[Natural Language] --> B[any-mcp-cli]
         A2[Tool Calls] --> B
-        A3[Web Requests] --> C[Web API]
+        A3[Web Requests] --> C[any-mcp Web API]
     end
     
-    subgraph "Interface Layer"
-        B --> D[NL Parser]
-        B --> E[Tool Router]
-        C --> E
-        D --> F[Fuzzy Matcher]
-        F --> E
+    subgraph "any-mcp Package"
+        B --> D[CLI Interface]
+        C --> E[API Layer]
+        D --> F[Core Engine]
+        E --> F
+        F --> G[MCP Manager]
+        F --> H[Tool Manager]
+        F --> I[LLM Service]
     end
     
-    subgraph "AI Engine (Optional)"
-        G[LLM Service] --> D
-        G --> H[ToolManager]
-        G1[Claude] --> G
-        G2[Gemini] --> G
+    subgraph "Core Modules"
+        G --> J[Manager Layer]
+        H --> K[Tool Discovery]
+        I --> L[Claude/Gemini]
+        J --> M[Installer]
+        J --> N[Lifecycle]
     end
     
-    subgraph "MCP Layer"
-        E --> I[MCPManager]
-        H --> I
-        I --> J[Git MCP]
-        I --> K[Filesystem MCP]
-        I --> L[GitHub MCP]
-        I --> M[Any MCP...]
-    end
-    
-    subgraph "Sources"
-        J --> N[Python Module]
-        K --> O[Docker Image]
-        L --> P[Local Script]
-        M --> Q[Registry/Custom]
+    subgraph "MCP Integration"
+        M --> O[Git MCP]
+        M --> P[Filesystem MCP]
+        M --> Q[GitHub MCP]
+        M --> R[Any MCP...]
     end
     
     subgraph "External Services"
-        N --> R[Git Operations]
-        O --> S[File System]
-        P --> T[GitHub API]
-        Q --> U[Any API]
+        O --> S[Git Operations]
+        P --> T[File System]
+        Q --> U[GitHub API]
+        R --> V[Any API]
     end
     
     %% Config
-    V[mcp_config.yaml] --> I
+    W[config/mcp_config.yaml] --> G
     
     %% Styling
     style B fill:#e1f5fe
-    style D fill:#f3e5f5
-    style G fill:#e8f5e8
-    style I fill:#fff3e0
+    style F fill:#f3e5f5
+    style I fill:#e8f5e8
+    style G fill:#fff3e0
 ```
 
 ### Core Components
 
-1. **Natural Language CLI** (`any_mcp/cli/main.py`) - Polished command-line interface with natural language processing for one-shot tool calls
-2. **MCP Manager** (`any_mcp/managers/manager.py`) - Lifecycle management, health monitoring, and tool orchestration for multiple MCP servers
-3. **MCP Client** (`any_mcp/core/client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
-4. **MCP Installer** (`any_mcp/managers/installer.py`) - Multi-source MCP package installer supporting Docker, local files, and Python modules
-5. **Web API** (`any_mcp/api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
-6. **Multi-LLM Integration** (`any_mcp/core/claude.py`, `any_mcp/core/gemini.py`) - Optional LLM integration supporting both Claude and Gemini for advanced natural language processing and chat
-7. **Tool Management** (`any_mcp/core/tools.py`) - Centralized tool discovery and management across all MCPs
-8. **Connection Router** (`any_mcp/servers/connect_server.py`) - Flexible server connection interface for various MCP sources
+1. **CLI Interface** (`any_mcp/cli/main.py`) - Command-line interface with natural language processing for tool calls
+2. **Core Engine** (`any_mcp/main.py`) - Main application logic and MCP orchestration
+3. **MCP Manager** (`any_mcp/managers/manager.py`) - Lifecycle management, health monitoring, and tool orchestration
+4. **MCP Installer** (`any_mcp/managers/installer.py`) - Multi-source MCP package installer (Docker, local files, Python modules)
+5. **MCP Client** (`any_mcp/core/client.py`) - Enhanced client with tool discovery and calling capabilities
+6. **Web API** (`any_mcp/api/web_mcp.py`) - FastAPI-based HTTP interface for remote MCP operations
+7. **LLM Integration** (`any_mcp/core/claude.py`, `any_mcp/core/gemini.py`) - Claude and Gemini support for natural language processing
+8. **Tool Management** (`any_mcp/core/tools.py`) - Centralized tool discovery and management across all MCPs
+9. **Chat Interface** (`any_mcp/core/chat.py`, `any_mcp/core/cli_chat.py`) - LLM-powered chat and conversation management
+10. **Server Connector** (`any_mcp/servers/connect_server.py`) - Flexible server connection interface
 
 ## Quick Start
 
@@ -101,7 +97,7 @@ cd any-mcp
 pip install -e .
 
 # Copy example configuration
-cp example_mcp_config.yaml mcp_config.yaml
+cp config/example_mcp_config.yaml config/mcp_config.yaml
 
 # Set environment variables (optional)
 export GITHUB_TOKEN=your_github_token_here
@@ -140,16 +136,16 @@ any-mcp-cli chat --module mcp_server_git
 
 ```bash
 # List configured servers
-python any_mcp_cli.py list
+any-mcp-cli list
 
 # Install and configure MCPs
-python any_mcp_cli.py install --name docs --source local://mcp_server.py --desc "Document operations"
-python any_mcp_cli.py install --name git --source docker://git-mcp-image --desc "Git operations"
+any-mcp-cli install --name docs --source local://my_mcp.py --desc "Document operations"
+any-mcp-cli install --name git --source docker://git-mcp-image --desc "Git operations"
 
 # Start/stop servers
-python any_mcp_cli.py start --server docs
-python any_mcp_cli.py tools --server docs
-python any_mcp_cli.py stop --server docs
+any-mcp-cli start --server docs
+any-mcp-cli tools --server docs
+any-mcp-cli stop --server docs
 ```
 
 #### 3. Web API Server
@@ -218,7 +214,7 @@ curl http://localhost:8000/mcp/calculator/health
 
 ## Configuration
 
-Create a `mcp_config.yaml` file to define your MCPs:
+Create a `config/mcp_config.yaml` file to define your MCPs:
 
 ```yaml
 installed_mcps:
@@ -230,11 +226,12 @@ installed_mcps:
       GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
     enabled: true
 
-  calculator:
-    type: "local"
-    source: "./demos/mcp_calc_server.py"
-    description: "Mathematical operations"
-    enabled: true
+  # Add your custom MCPs here
+  # my_mcp:
+  #   type: "local"
+  #   source: "./my_custom_mcp.py"
+  #   description: "My custom MCP server"
+  #   enabled: true
 ```
 
 ## Supported MCP Sources

@@ -375,9 +375,9 @@ mcp/
 
 ### v1.0.0 - First Production Release (2025-01-08)
 
-🎉 **Major Milestone**: First stable release ready for production deployment and LLMGine integration.
+**Major Milestone**: First stable release ready for production deployment and LLMGine integration.
 
-**🚀 New Features:**
+** New Features:**
 - Universal MCP adapter with auto-discovery and tool orchestration
 - Multi-LLM support for Claude and Gemini with unified interface
 - Natural language processing for any MCP without API knowledge
@@ -386,7 +386,7 @@ mcp/
 - Production-ready configuration management and health monitoring
 - LLMGine-compatible deployment with secure environment handling
 
-**🔧 Technical Improvements:**
+** Technical Improvements:**
 - Standard MCP protocol compliance for seamless integration
 - Health check endpoints for monitoring and diagnostics
 - Secure environment variable configuration (no hardcoded secrets)
@@ -394,7 +394,7 @@ mcp/
 - Comprehensive error handling and logging throughout the stack
 - Multi-source MCP installation (Docker, local files, Python modules)
 
-**📚 Documentation:**
+** Documentation:**
 - Complete setup and deployment guides
 - LLMGine integration instructions with configuration examples
 - API documentation with cURL examples and JavaScript integration
@@ -411,17 +411,6 @@ This release establishes any-mcp as a stable, production-ready platform for MCP 
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### MIT License Summary
-
-- ✅ **Commercial use** - You can use this software for commercial purposes
-- ✅ **Modification** - You can modify the source code
-- ✅ **Distribution** - You can distribute the software
-- ✅ **Private use** - You can use the software privately
-- ✅ **Patent use** - You can use any patents related to the software
-
-**Requirements:**
-- Include the original copyright notice and license in any distributed copies
-- Include the license and copyright notice in any substantial portions used
 
 ### Running Tests
 

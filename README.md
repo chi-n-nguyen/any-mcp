@@ -401,6 +401,10 @@ The project includes a Notion MCP server (`notion_mcp_server.py`) that enables n
 - Go to [Notion Integrations](https://www.notion.so/my-integrations)
 - Create a new integration and copy the key
 - Share your databases/pages with the integration
+- Set the API key as an environment variable:
+  ```bash
+  export NOTION_API_KEY=your_notion_integration_key_here
+  ```
 
 **2. Test Direct Tool Calls:**
 ```bash
@@ -523,6 +527,9 @@ The project is ready for LLMGine integration with standard MCP protocol complian
 
 **Quick Setup for LLMGine:**
 ```bash
+# Set your Notion API key
+export NOTION_API_KEY=your_notion_integration_key_here
+
 # Use the launcher script
 ./launch_notion_mcp.sh
 

@@ -1,6 +1,7 @@
 # any-mcp
 
 [![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/chi-n-nguyen/any-mcp/releases/tag/v1.0.0)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![LLMGine Ready](https://img.shields.io/badge/LLMGine-Ready-green.svg)](https://github.com/chi-n-nguyen/any-mcp)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-orange.svg)](https://modelcontextprotocol.io/)
 
@@ -372,6 +373,7 @@ mcp/
 ├── example_mcp_config.yaml # Example configuration
 └── README.md              # This file
 └── VERSION                # Version file
+└── LICENSE                # MIT License file
 ```
 
 ## Release Notes
@@ -409,6 +411,22 @@ mcp/
 - Production-ready secret management practices
 
 This release establishes any-mcp as a stable, production-ready platform for MCP integration with modern LLM systems.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### MIT License Summary
+
+- ✅ **Commercial use** - You can use this software for commercial purposes
+- ✅ **Modification** - You can modify the source code
+- ✅ **Distribution** - You can distribute the software
+- ✅ **Private use** - You can use the software privately
+- ✅ **Patent use** - You can use any patents related to the software
+
+**Requirements:**
+- Include the original copyright notice and license in any distributed copies
+- Include the license and copyright notice in any substantial portions used
 
 ### Running Tests
 

@@ -14,7 +14,7 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 - **Multi-Source Installation**: Install MCPs from Docker, local files, or registry modules
 - **Polished CLI**: Modern command-line interface with subcommands for all operations
 - **Web API**: RESTful interface for remote MCP management and tool calling
-- **Claude Integration**: Optional LLM-powered chat mode for advanced natural language processing
+- **Multi-LLM Support**: Optional LLM-powered chat mode with Claude and Gemini support for advanced natural language processing
 - **Production Ready**: Includes configuration management, logging, and cleanup
 
 ## Architecture
@@ -36,8 +36,10 @@ graph TD
     end
     
     subgraph "AI Engine (Optional)"
-        G[Claude LLM] --> D
+        G[LLM Service] --> D
         G --> H[ToolManager]
+        G1[Claude] --> G
+        G2[Gemini] --> G
     end
     
     subgraph "MCP Layer"
@@ -80,7 +82,7 @@ graph TD
 3. **MCP Client** (`mcp_client.py`) - Enhanced client with complete tool discovery and calling capabilities with robust error handling
 4. **MCP Installer** (`mcp_installer.py`) - Multi-source MCP package installer supporting Docker, local files, and Python modules
 5. **Web API** (`api/web_mcp.py`) - FastAPI-based HTTP interface for all MCP operations with RESTful endpoints
-6. **Claude Integration** (`core/claude.py`) - Optional LLM integration for advanced natural language processing and chat
+6. **Multi-LLM Integration** (`core/claude.py`, `core/gemini.py`) - Optional LLM integration supporting both Claude and Gemini for advanced natural language processing and chat
 7. **Tool Management** (`core/tools.py`) - Centralized tool discovery and management across all MCPs
 8. **Connection Router** (`connect_server.py`) - Flexible server connection interface for various MCP sources
 
@@ -115,7 +117,7 @@ python any_mcp_cli.py nl --module mcp_server_git --module-args "--repository ." 
 python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
 python any_mcp_cli.py call --module mcp_server_git --tool git_status --args repo_path=.
 
-# Interactive chat (requires Claude API key)
+# Interactive chat (requires Claude or Gemini API key)
 python any_mcp_cli.py chat --script mcp_server.py
 ```
 
@@ -316,6 +318,7 @@ mcp/
 ├── core/                   # Core functionality
 │   ├── chat.py            # Chat interface for LLM interactions
 │   ├── claude.py          # Claude API integration
+│   ├── gemini.py          # Gemini API integration
 │   ├── cli_chat.py        # CLI chat implementation
 │   ├── cli.py             # Command line interface
 │   ├── tools.py           # Tool management and discovery
@@ -354,8 +357,11 @@ pytest tests/ --cov=. --cov-report=html
 ### Environment Variables
 
 ```bash
+export LLM_PROVIDER=gemini  # or 'claude'
 export CLAUDE_MODEL=claude-3-sonnet-20240229
 export ANTHROPIC_API_KEY=your_anthropic_key
+export GEMINI_MODEL=gemini-1.5-pro
+export GEMINI_API_KEY=your_gemini_key
 export GITHUB_TOKEN=your_github_token
 export USE_UV=1
 export LOG_LEVEL=INFO

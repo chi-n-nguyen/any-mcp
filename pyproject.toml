@@ -70,9 +70,9 @@ docs = [
 ]
 
 [project.scripts]
-any-mcp = "main:main"
-mcp-server = "api.web_mcp:main"
-any-mcp-cli = "any_mcp_cli:main"
+any-mcp = "any_mcp.main:main"
+mcp-server = "any_mcp.api.web_mcp:main"
+any-mcp-cli = "any_mcp.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/ai-dscubed/any-mcp"
@@ -82,8 +82,8 @@ Issues = "https://github.com/ai-dscubed/any-mcp/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["core*", "api*", "demos*"]
-exclude = ["tests*", "docs*"]
+include = ["any_mcp*"]
+exclude = ["tests*", "docs*", "examples*", "scripts*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.yaml", "*.yml", "*.json", "*.md"]

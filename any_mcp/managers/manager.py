@@ -4,8 +4,8 @@ import os
 from typing import Dict, List, Optional, Any
 from contextlib import AsyncExitStack
 
-from mcp_client import MCPClient
-from mcp_installer import MCPInstaller, MCPConfig, MCPType
+from any_mcp.core.client import MCPClient
+from any_mcp.managers.installer import MCPInstaller, MCPConfig, MCPType
 from mcp import types
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ class MCPManager:
     MCP lifecycle manager for starting, stopping, and monitoring MCP servers.
     Provides health checks, tool orchestration, and status reporting.
     """
-    def __init__(self, config_path: str = "mcp_config.yaml"):
+    def __init__(self, config_path: str = "config/mcp_config.yaml"):
         self.installer = MCPInstaller(config_path)
         self.active_clients: Dict[str, MCPClient] = {}
         self.exit_stack = AsyncExitStack()

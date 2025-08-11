@@ -19,11 +19,11 @@ import os
 from contextlib import AsyncExitStack
 from typing import Optional, Dict, Any
 
-from mcp_client import MCPClient
-from mcp_manager import MCPManager
-from core.claude import Claude
-from core.cli_chat import CliChat
-from core.cli import CliApp
+from any_mcp.core.client import MCPClient
+from any_mcp.managers.manager import MCPManager
+from any_mcp.core.claude import Claude
+from any_mcp.core.cli_chat import CliChat
+from any_mcp.core.cli import CliApp
 
 from dotenv import load_dotenv
 

@@ -1,8 +1,8 @@
 from typing import Union
-from core.claude import Claude
-from core.gemini import Gemini
-from mcp_client import MCPClient
-from core.tools import ToolManager
+from any_mcp.core.claude import Claude
+from any_mcp.core.gemini import Gemini
+from any_mcp.core.client import MCPClient
+from any_mcp.core.tools import ToolManager
 from anthropic.types import MessageParam
 
 

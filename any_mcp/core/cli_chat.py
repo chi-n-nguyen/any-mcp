@@ -2,10 +2,10 @@ from typing import List, Tuple, Union
 from mcp.types import Prompt, PromptMessage
 from anthropic.types import MessageParam
 
-from core.chat import Chat
-from core.claude import Claude
-from core.gemini import Gemini
-from mcp_client import MCPClient
+from any_mcp.core.chat import Chat
+from any_mcp.core.claude import Claude
+from any_mcp.core.gemini import Gemini
+from any_mcp.core.client import MCPClient
 
 
 class CliChat(Chat):

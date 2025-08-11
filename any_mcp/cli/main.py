@@ -34,11 +34,11 @@ import re
 from rich.console import Console
 from rich.table import Table
 
-from mcp_manager import MCPManager
-from mcp_client import MCPClient
-from connect_server import ServerConnector
-from core.chat import Chat
-from core.claude import Claude
+from any_mcp.managers.manager import MCPManager
+from any_mcp.core.client import MCPClient
+from any_mcp.servers.connect_server import ServerConnector
+from any_mcp.core.chat import Chat
+from any_mcp.core.claude import Claude
 
 
 console = Console()

@@ -306,4 +306,4 @@ async def check_mcp_health(mcp_name: str):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("api.web_mcp:app", host="0.0.0.0", port=8000, reload=True) 
+    uvicorn.run("any_mcp.api.web_mcp:app", host="0.0.0.0", port=8000, reload=True)

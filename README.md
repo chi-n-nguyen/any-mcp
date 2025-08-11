@@ -191,25 +191,25 @@ async with MCPManager() as manager:
 # List all MCPs
 curl http://localhost:8000/mcp
 
-# Install a new MCP
+# Install a new MCP (example: Git MCP)
 curl -X POST http://localhost:8000/mcp/install \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "calculator",
-    "source": "local://./demos/mcp_calc_server.py",
-    "description": "Calculator MCP for math operations"
+    "name": "git",
+    "source": "module://mcp_server_git",
+    "description": "Git operations via MCP"
   }'
 
-# Call a tool
-curl -X POST http://localhost:8000/mcp/calculator/call \
+# Call a tool (example)
+curl -X POST http://localhost:8000/mcp/git/call \
   -H "Content-Type: application/json" \
   -d '{
-    "tool_name": "add",
-    "args": {"a": 5, "b": 3}
+    "tool_name": "git_status",
+    "args": {"repo_path": "."}
   }'
 
 # Check MCP health
-curl http://localhost:8000/mcp/calculator/health
+curl http://localhost:8000/mcp/git/health
 ```
 
 ## Configuration

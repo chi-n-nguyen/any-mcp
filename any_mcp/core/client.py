@@ -123,12 +123,11 @@ class MCPClient:
         await self.cleanup()
 
 
-# For testing
+# For testing (example; requires a configured MCP)
 async def main():
     async with MCPClient(
-        # If using Python without UV, update command to 'python' and remove "run" from args.
         command="uv",
-        args=["run", "mcp_server.py"],
+        args=["run", "your_mcp_server.py"],
     ) as client:
         tools = await client.list_tools()
         print(f"Available tools: {[tool.name for tool in tools]}")

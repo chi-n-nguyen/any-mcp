@@ -4,22 +4,22 @@ Any-MCP Polished CLI
 
 Usage examples:
   # List configured MCP servers and status
-  python any_mcp_cli.py list
+  any-mcp-cli list
 
   # Install a local MCP script and enable it
-  python any_mcp_cli.py install --name docs --source local://mcp_server.py --desc "Docs demo"
+  any-mcp-cli install --name docs --source local://my_mcp.py --desc "Docs demo"
 
   # Start a configured server, list its tools, and call a tool
-  python any_mcp_cli.py start --server docs
-  python any_mcp_cli.py tools --server docs
-  python any_mcp_cli.py call --server docs --tool read_document --args doc_id=plan.md
+  any-mcp-cli start --server docs
+  any-mcp-cli tools --server docs
+  any-mcp-cli call --server docs --tool read_document --args doc_id=plan.md
 
   # One-shot against a script or docker image without configuration
-  python any_mcp_cli.py call --script mcp_server.py --tool read_document --args doc_id=plan.md
-  python any_mcp_cli.py call --docker my/mcp-image:latest --tool do_something --args key=value
+  any-mcp-cli call --script my_mcp.py --tool read_document --args doc_id=plan.md
+  any-mcp-cli call --docker my/mcp-image:latest --tool do_something --args key=value
 
   # Start chat (requires CLAUDE env vars); falls back to basic mode otherwise
-  python any_mcp_cli.py chat --server docs
+  any-mcp-cli chat --server docs
 """
 
 from __future__ import annotations

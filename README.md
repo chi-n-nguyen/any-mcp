@@ -6,7 +6,7 @@
 
 A universal adapter that safely starts any MCP package, discovers available tools, and provides a unified interface for users and LLMs to interact with them through a single, standardized API.
 
-> **🎉 First Production Release v1.0.0** - Ready for LLMGine integration with full MCP protocol compliance, multi-LLM support, and production-ready deployment.
+> **First Production Release v1.0.0** - Ready for LLMgine integration with full MCP protocol compliance, multi-LLM support, and production-ready deployment.
 
 ## Mission
 

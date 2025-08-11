@@ -1,6 +1,12 @@
 # any-mcp
 
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/chi-n-nguyen/any-mcp/releases/tag/v1.0.0)
+[![LLMGine Ready](https://img.shields.io/badge/LLMGine-Ready-green.svg)](https://github.com/chi-n-nguyen/any-mcp)
+[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-orange.svg)](https://modelcontextprotocol.io/)
+
 A universal adapter that safely starts any MCP package, discovers available tools, and provides a unified interface for users and LLMs to interact with them through a single, standardized API.
+
+> **🎉 First Production Release v1.0.0** - Ready for LLMGine integration with full MCP protocol compliance, multi-LLM support, and production-ready deployment.
 
 ## Mission
 
@@ -91,6 +97,10 @@ graph TD
 ### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/chi-n-nguyen/any-mcp.git
+cd any-mcp
+
 # Install dependencies
 pip install -e .
 
@@ -100,6 +110,19 @@ cp example_mcp_config.yaml mcp_config.yaml
 # Set environment variables (optional)
 export GITHUB_TOKEN=your_github_token_here
 export USE_UV=1  # Use uv for faster Python execution
+```
+
+### Quick Start with v1.0.0 Release
+
+```bash
+# Download the latest release
+wget https://github.com/chi-n-nguyen/any-mcp/archive/refs/tags/v1.0.0.tar.gz
+tar -xzf v1.0.0.tar.gz
+cd any-mcp-1.0.0
+
+# Install and run
+pip install -e .
+python main.py
 ```
 
 ### Basic Usage
@@ -348,7 +371,44 @@ mcp/
 ├── main.py                # Main application entry point
 ├── example_mcp_config.yaml # Example configuration
 └── README.md              # This file
+└── VERSION                # Version file
 ```
+
+## Release Notes
+
+### v1.0.0 - First Production Release (2025-01-08)
+
+🎉 **Major Milestone**: First stable release ready for production deployment and LLMGine integration.
+
+**🚀 New Features:**
+- Universal MCP adapter with auto-discovery and tool orchestration
+- Multi-LLM support for Claude and Gemini with unified interface
+- Natural language processing for any MCP without API knowledge
+- RESTful Web API with comprehensive endpoints for remote management
+- Notion workspace integration with task tracking and database queries
+- Production-ready configuration management and health monitoring
+- LLMGine-compatible deployment with secure environment handling
+
+**🔧 Technical Improvements:**
+- Standard MCP protocol compliance for seamless integration
+- Health check endpoints for monitoring and diagnostics
+- Secure environment variable configuration (no hardcoded secrets)
+- Docker and local deployment support with launcher scripts
+- Comprehensive error handling and logging throughout the stack
+- Multi-source MCP installation (Docker, local files, Python modules)
+
+**📚 Documentation:**
+- Complete setup and deployment guides
+- LLMGine integration instructions with configuration examples
+- API documentation with cURL examples and JavaScript integration
+- Security best practices and environment variable management
+
+**🔒 Security:**
+- All sensitive data moved to environment variables
+- Git history cleaned of any hardcoded secrets
+- Production-ready secret management practices
+
+This release establishes any-mcp as a stable, production-ready platform for MCP integration with modern LLM systems.
 
 ### Running Tests
 

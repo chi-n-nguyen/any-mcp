@@ -2,7 +2,6 @@
 
 [![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/chi-n-nguyen/any-mcp/releases/tag/v1.0.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![LLMGine Ready](https://img.shields.io/badge/LLMGine-Ready-green.svg)](https://github.com/chi-n-nguyen/any-mcp)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-orange.svg)](https://modelcontextprotocol.io/)
 
 A universal adapter that safely starts any MCP package, discovers available tools, and provides a unified interface for users and LLMs to interact with them through a single, standardized API.

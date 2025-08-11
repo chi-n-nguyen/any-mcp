@@ -7,25 +7,42 @@ from contextlib import AsyncExitStack
 from mcp_client import MCPClient
 from mcp_manager import MCPManager
 from core.claude import Claude
+from core.gemini import Gemini
 
 from core.cli_chat import CliChat
 from core.cli import CliApp
 
 load_dotenv()
 
-# Anthropic Config
+# LLM Config - Support both Claude and Gemini
+llm_provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+
+# Claude Config
 claude_model = os.getenv("CLAUDE_MODEL", "")
 anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
 
+# Gemini Config  
+gemini_model = os.getenv("GEMINI_MODEL", "gemini-1.5-pro")
+gemini_api_key = os.getenv("GEMINI_API_KEY", "")
 
-assert claude_model, "Error: CLAUDE_MODEL cannot be empty. Update .env"
-assert anthropic_api_key, (
-    "Error: ANTHROPIC_API_KEY cannot be empty. Update .env"
-)
+# Validate configuration based on provider
+if llm_provider == "claude":
+    assert claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"
+    assert anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"
+elif llm_provider == "gemini":
+    assert gemini_api_key, "Error: GEMINI_API_KEY cannot be empty when using Gemini. Update .env"
+else:
+    raise ValueError(f"Unsupported LLM_PROVIDER: {llm_provider}. Use 'claude' or 'gemini'")
 
 
 async def main():
-    claude_service = Claude(model=claude_model)
+    # Initialize LLM service based on provider
+    if llm_provider == "claude":
+        llm_service = Claude(model=claude_model)
+    elif llm_provider == "gemini":
+        llm_service = Gemini(model=gemini_model, api_key=gemini_api_key)
+    else:
+        raise ValueError(f"Unsupported LLM provider: {llm_provider}")
 
     # Initialize MCP Manager to handle all configured MCPs
     mcp_manager = MCPManager()
@@ -67,7 +84,7 @@ async def main():
         chat = CliChat(
             doc_client=doc_client,
             clients=clients,
-            claude_service=claude_service,
+            claude_service=llm_service,
         )
 
         cli = CliApp(chat)

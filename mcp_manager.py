@@ -116,25 +116,42 @@ class MCPManager:
             return None
 
     async def _setup_local_mcp(self, mcp_config: MCPConfig) -> Optional[MCPClient]:
-        """Setup a local Python MCP."""
+        """Setup a local MCP (Python scripts, NPX packages, or other commands)."""
         try:
             # Prepare environment variables
             env = os.environ.copy()
             env.update(mcp_config.env_vars)
 
-            # Determine if we should use uv or python
-            use_uv = os.getenv("USE_UV", "0") == "1"
+            # Parse the source command
+            source_parts = mcp_config.source.split()
             
-            if use_uv:
+            if source_parts[0] == "npx":
+                # Handle NPX commands
                 client = MCPClient(
-                    command="uv",
-                    args=["run", mcp_config.source],
+                    command="npx",
+                    args=source_parts[1:],  # Everything after "npx"
                     env=env
                 )
+            elif mcp_config.source.endswith(".py"):
+                # Handle Python scripts
+                use_uv = os.getenv("USE_UV", "0") == "1"
+                if use_uv:
+                    client = MCPClient(
+                        command="uv",
+                        args=["run", mcp_config.source],
+                        env=env
+                    )
+                else:
+                    client = MCPClient(
+                        command="python",
+                        args=[mcp_config.source],
+                        env=env
+                    )
             else:
+                # Handle other commands (parse the full command)
                 client = MCPClient(
-                    command="python",
-                    args=[mcp_config.source],
+                    command=source_parts[0],
+                    args=source_parts[1:] if len(source_parts) > 1 else [],
                     env=env
                 )
 

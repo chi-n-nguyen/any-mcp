@@ -1,11 +1,32 @@
 installed_mcps:
-  # Keep only MCPs you actively use. Examples below are commented out.
-  # Enable by setting `enabled: true` and providing required env vars.
-  #
-  # github:
-  #   type: "docker"
-  #   source: "ghcr.io/github/github-mcp-server"
-  #   description: "GitHub's official MCP server"
+  github:
+    type: "docker"
+    source: "ghcr.io/github/github-mcp-server"
+    description: "GitHub's official MCP server for repository operations"
+    env_vars:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+      GITHUB_TOOLSETS: "all"
+    enabled: true
+
+  calculator:
+    type: "local"
+    source: "./demos/mcp_calc_server.py"
+    description: "Simple calculator MCP for mathematical operations"
+    env_vars: {}
+    enabled: true
+
+  documents:
+    type: "local"
+    source: "./mcp_server.py"
+    description: "Document management MCP for reading and editing documents"
+    env_vars: {}
+    enabled: true
+
+  # Example of a disabled MCP
+  # experimental:
+  #   type: "local"
+  #   source: "./mcps/experimental_mcp.py"
+  #   description: "Experimental MCP - disabled by default"
   #   env_vars:
-  #     GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
-  #   enabled: false
+  #     DEBUG_MODE: "true"
+  #   enabled: false 

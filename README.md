@@ -102,7 +102,29 @@ cp config/example_mcp_config.yaml config/mcp_config.yaml
 # Set environment variables (optional)
 export GITHUB_TOKEN=your_github_token_here
 export USE_UV=1  # Use uv for faster Python execution
+
+### Using the Rich Notion MCP CLI
+
+Experience a beautiful, interactive interface for your Notion MCP:
+
+```bash
+# Run the rich CLI
+python3 notion_cli.py
+
+# Available commands:
+#   search <query> - Search across Notion content
+#   page <id> - Get page content details
+#   health - Check connection status
+#   help - Show available tools
+#   quit - Exit CLI
 ```
+
+The rich CLI features:
+- 🎨 **Beautiful UI**: Colorful tables, panels, and status indicators
+- 📊 **Rich Tables**: Formatted search results with pagination
+- 🔍 **Interactive Search**: Real-time search across your Notion workspace
+- 📄 **Page Details**: Rich page information display
+- 💚 **Health Monitoring**: Connection status with user details
 
 ### Quick Start with v1.0.0 Release
 
@@ -325,7 +347,9 @@ When running the web API, visit:
 
 ### Using the Notion MCP Example
 
-The repository includes a complete Notion MCP implementation at `examples/notion_mcp_server.py` that serves as a comprehensive template for building your own MCP servers. This example demonstrates all the essential patterns and best practices.
+The repository includes a complete Notion MCP implementation at `examples/notion_mcp_server.py` that serves as a comprehensive template for building your own MCP servers. This example demonstrates all the essential patterns and best practices. 
+
+**Try the Rich CLI**: Run `python3 notion_cli.py` for a beautiful, interactive interface to test your Notion MCP!
 
 #### Key Components Demonstrated
 

@@ -12,20 +12,20 @@ from any_mcp.core.gemini import Gemini
 from any_mcp.core.cli_chat import CliChat
 from any_mcp.core.cli import CliApp
 
-load_dotenv()
+import config
 
 # LLM Config - Support both Claude and Gemini
-llm_provider = os.getenv("LLM_PROVIDER", "gemini").lower()
+llm_provider = config.LLM_PROVIDER
 
 # Claude Config
-claude_model = os.getenv("CLAUDE_MODEL", "")
-anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+claude_model = config.CLAUDE_MODEL
+anthropic_api_key = config.ANTHROPIC_API_KEY
 
 # Gemini Config  
-gemini_model = os.getenv("GEMINI_MODEL", "gemini-1.5-pro")
-gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+gemini_model = config.GEMINI_MODEL
+gemini_api_key = config.GEMINI_API_KEY
 
-# Validate configuration based on provider
+# Check llm_provider + raise error if .env file is not well-defined
 if llm_provider == "claude":
     assert claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"
     assert anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"

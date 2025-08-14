@@ -294,9 +294,14 @@ python any_mcp_cli.py call --module mcp_server_filesystem --tool read_file --arg
 pip install mcp-server-sqlite
 python any_mcp_cli.py call --module mcp_server_sqlite --tool execute_query --args query="SELECT * FROM users"
 
-# Notion workspace integration (included)
-python any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=in_progress
-python any_mcp_cli.py nl --script notion_mcp_server.py --query "Show me my course notes"
+# Notion workspace integration (via official Notion MCP)
+# 1) Ensure `config/mcp_config.yaml` has the `notion` server (see Configuration section)
+# 2) Set the NOTION_API_TOKEN/NOTION_API_KEY env vars
+# 3) List tools and call one
+any-mcp-cli list
+any-mcp-cli tools --server notion
+any-mcp-cli call --server notion --tool TOOL_NAME --args key=value
+any-mcp-cli nl --server notion --query "search query=project notes"
 ```
 
 ## Error Handling and Resilience
@@ -359,7 +364,7 @@ any_mcp/
 - Multi-LLM support for Claude and Gemini with unified interface
 - Natural language processing for any MCP without API knowledge
 - RESTful Web API with comprehensive endpoints for remote management
-- Notion workspace integration with task tracking and database queries
+- Works seamlessly with the official Notion MCP (via NPX) for workspace operations
 - Production-ready configuration management and health monitoring
 - LLMGine-compatible deployment with secure environment handling
 
@@ -430,77 +435,52 @@ EXPOSE 8000
 CMD ["uvicorn", "any_mcp.api.web_mcp:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
-<!-- Notion/demo content removed during cleanup to reflect universal MCP usage only -->
+#### Setting Up Notion MCP (official server)
 
-#### Setting Up Notion MCP Server
+The adapter works out of the box with the official Notion MCP published by Notion.
 
-The project includes a Notion MCP server (`notion_mcp_server.py`) that enables natural language queries to your Notion workspace.
-
-**1. Get Your Notion Integration Key:**
-- Go to [Notion Integrations](https://www.notion.so/my-integrations)
-- Create a new integration and copy the key
-- Share your databases/pages with the integration
-- Set the API key as an environment variable:
+**1) Create a Notion integration and get a token:**
+- Visit the Notion Integrations page and create an internal integration
+- Share databases/pages with that integration
+- Export your secret as an environment variable (names supported by different Notion releases vary):
   ```bash
-  export NOTION_API_KEY=your_notion_integration_key_here
+  export NOTION_API_TOKEN=your_secret
+  # or
+  export NOTION_API_KEY=your_secret
   ```
 
-**2. Test Direct Tool Calls:**
-```bash
-# Activate virtual environment (if not already active)
-source .venv/bin/activate
-
-# Get all tasks from your Task Tracker
-uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=all
-
-# Get tasks by status
-uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_task_tracker_tasks --args status_filter=in_progress
-
-# Get database contents
-uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_database_contents --args database_id=YOUR_DATABASE_ID
-
-# Get specific page content
-uv run python3 any_mcp_cli.py call --script notion_mcp_server.py --tool get_page_content --args page_id=YOUR_PAGE_ID
+**2) Configure any-mcp to start the Notion server:**
+Ensure your `config/mcp_config.yaml` contains the `notion` entry:
+```yaml
+installed_mcps:
+  notion:
+    type: "local"
+    source: "npx -y @notionhq/notion-mcp-server"
+    description: "Official Notion MCP Server"
+    env_vars:
+      NOTION_API_TOKEN: "${NOTION_API_TOKEN}"
+      NOTION_API_KEY: "${NOTION_API_KEY}"
+    enabled: true
 ```
 
-**3. Enable Natural Language Queries:**
-
-Create a `.env` file with your LLM provider:
+**3) List tools and run commands:**
 ```bash
-# For Gemini (recommended - free tier available)
-echo "LLM_PROVIDER=gemini" > .env
-echo "GEMINI_API_KEY=your_gemini_api_key_here" >> .env
-
-# OR for Claude
-echo "LLM_PROVIDER=claude" > .env
-echo "ANTHROPIC_API_KEY=your_anthropic_key_here" >> .env
+any-mcp-cli list
+any-mcp-cli tools --server notion
+any-mcp-cli call --server notion --tool TOOL_NAME --args key=value
+any-mcp-cli nl --server notion --query "search query=project notes"
 ```
 
-**4. Use Natural Language Queries:**
+Tool names come from the official server and may change across versions. Use `tools` to discover the available operations.
+
+**4) Web API Access:**
+
+Start the API server:
 ```bash
-# Ask questions in plain English
-uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "What are my high priority tasks due this month?"
-
-uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "Show me all my course notes from COMP20008"
-
-uv run python3 any_mcp_cli.py nl --script notion_mcp_server.py --query "What goals do I have that are marked as done?"
+python -m any_mcp.api.web_mcp
 ```
 
-**5. Interactive Chat Mode:**
-```bash
-# Start interactive session with Notion
-uv run python3 any_mcp_cli.py chat --script notion_mcp_server.py
-```
-
-**6. Web API Access:**
-
-Start the web server:
-```bash
-# Start web server
-uv run python3 -m api.web_mcp
-```
-
-**RESTful API Endpoints:**
+Call through HTTP:
 ```bash
 # Check API health
 curl http://localhost:8000/health
@@ -508,90 +488,13 @@ curl http://localhost:8000/health
 # List all MCPs
 curl http://localhost:8000/mcp
 
-# List tools for specific MCP
-curl http://localhost:8000/mcp/notion_custom/tools
+# List tools for Notion
+curl http://localhost:8000/mcp/notion/tools
 
-# Call Notion tools via HTTP
-curl -X POST http://localhost:8000/mcp/notion_custom/call \
+# Call a Notion tool (replace TOOL_NAME and args)
+curl -X POST http://localhost:8000/mcp/notion/call \
   -H "Content-Type: application/json" \
-  -d '{"tool_name": "get_task_tracker_tasks", "args": {"status_filter": "all"}}'
-
-# Get high priority tasks
-curl -X POST http://localhost:8000/mcp/notion_custom/call \
-  -H "Content-Type: application/json" \
-  -d '{"tool_name": "get_task_tracker_tasks", "args": {"status_filter": "in_progress"}}'
-
-# Query specific database
-curl -X POST http://localhost:8000/mcp/notion_custom/call \
-  -H "Content-Type: application/json" \
-  -d '{"tool_name": "get_database_contents", "args": {"database_id": "YOUR_DATABASE_ID"}}'
-
-# Search Notion content
-curl -X POST http://localhost:8000/mcp/notion_custom/call \
-  -H "Content-Type: application/json" \
-  -d '{"tool_name": "search_notion", "args": {"query": "MCP", "filter_type": "page"}}'
-```
-
-**Web Interface Demo:**
-Open `notion_web_demo.html` in your browser for an interactive web interface to test the API.
-
-**JavaScript/Web Integration:**
-```javascript
-// Example web app integration
-async function getMyTasks() {
-    const response = await fetch('http://localhost:8000/mcp/notion_custom/call', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            tool_name: 'get_task_tracker_tasks',
-            args: { status_filter: 'all' }
-        })
-    });
-    const data = await response.json();
-    const tasks = JSON.parse(data.data.content[0].text);
-    return tasks;
-}
-```
-
-**Available Notion Tools:**
-- `search_notion` - Search across all accessible content
-- `get_database_contents` - Get contents from a specific database
-- `get_page_content` - Get content of a specific page
-- `get_task_tracker_tasks` - Get tasks with status filtering
-- `health_check` - Health check for LLMGine integration
-
-### LLMGine Integration
-
-The project is ready for LLMGine integration with standard MCP protocol compliance:
-
-**Quick Setup for LLMGine:**
-```bash
-# Set your Notion API key
-export NOTION_API_KEY=your_notion_integration_key_here
-
-# Use the launcher script
-./launch_notion_mcp.sh
-
-# Or directly
-python3 notion_mcp_server.py
-```
-
-**LLMGine Configuration:**
-```json
-{
-  "mcpServers": {
-    "notion": {
-      "command": "./launch_notion_mcp.sh",
-      "cwd": "/path/to/any-mcp",
-      "description": "Notion workspace integration with task tracking"
-    }
-  }
-}
-```
-
-**Health Check:**
-```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"health_check","arguments":{}}}' | python3 notion_mcp_server.py
+  -d '{"tool_name": "TOOL_NAME", "args": {"key": "value"}}'
 ```
 
 ### Health Monitoring

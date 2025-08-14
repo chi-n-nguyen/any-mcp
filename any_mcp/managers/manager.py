@@ -93,14 +93,19 @@ class MCPManager:
         try:
             # Prepare environment variables
             env = os.environ.copy()
-            env.update(mcp_config.env_vars)
+            # Expand any ${VAR} references from config using current environment
+            expanded_env_vars = {
+                key: os.path.expandvars(value) if isinstance(value, str) else value
+                for key, value in (mcp_config.env_vars or {}).items()
+            }
+            env.update(expanded_env_vars)
 
             # Create client with docker command
             client = MCPClient(
                 command="docker",
                 args=[
                     "run", "-i", "--rm",
-                    *[item for key, value in mcp_config.env_vars.items() 
+                    *[item for key, value in expanded_env_vars.items() 
                       for item in ["-e", f"{key}={value}"]],
                     mcp_config.source
                 ],
@@ -120,7 +125,12 @@ class MCPManager:
         try:
             # Prepare environment variables
             env = os.environ.copy()
-            env.update(mcp_config.env_vars)
+            # Expand any ${VAR} references from config using current environment
+            expanded_env_vars = {
+                key: os.path.expandvars(value) if isinstance(value, str) else value
+                for key, value in (mcp_config.env_vars or {}).items()
+            }
+            env.update(expanded_env_vars)
 
             # Parse the source command
             source_parts = mcp_config.source.split()

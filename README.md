@@ -321,6 +321,151 @@ When running the web API, visit:
 - **ReDoc**: http://localhost:8000/redoc
 - **Health Check**: http://localhost:8000/health
 
+## Building Your Own MCP Server
+
+### Using the Notion MCP Example
+
+The repository includes a complete Notion MCP implementation at `examples/notion_mcp_server.py` that serves as a comprehensive template for building your own MCP servers. This example demonstrates all the essential patterns and best practices.
+
+#### Key Components Demonstrated
+
+1. **Server Setup and JSON-RPC Handling**
+   - Proper MCP protocol implementation
+   - Tool registration and discovery
+   - Request routing and error handling
+
+2. **External API Integration**
+   - Environment variable configuration
+   - HTTP client setup with proper headers
+   - API error handling and response parsing
+
+3. **Tool Implementation Patterns**
+   - Input validation and schema definition
+   - Async operation handling
+   - Structured response formatting
+
+#### Following the Example
+
+**Step 1: Copy the Template**
+```bash
+cp examples/notion_mcp_server.py examples/your_service_mcp_server.py
+```
+
+**Step 2: Modify for Your Service**
+- Replace Notion API calls with your service's API
+- Update tool definitions in `__init__`
+- Modify authentication headers and endpoints
+- Implement your specific business logic
+
+**Step 3: Test Your Implementation**
+```bash
+# Set your service's environment variables
+export YOUR_SERVICE_API_KEY=your_api_key
+
+# Test with any-mcp-cli
+any-mcp-cli call --script examples/your_service_mcp_server.py --tool your_tool --args key=value
+```
+
+#### Common Patterns to Follow
+
+**Tool Registration:**
+```python
+self.tools = [
+    {
+        "name": "your_tool_name",
+        "description": "Clear description of what this tool does",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "required_param": {
+                    "type": "string",
+                    "description": "Description of this parameter"
+                }
+            },
+            "required": ["required_param"]
+        }
+    }
+]
+```
+
+**API Integration:**
+```python
+async def your_tool_method(self, param: str) -> Dict[str, Any]:
+    """Your tool implementation."""
+    try:
+        response = requests.get(
+            f"{YOUR_API_BASE_URL}/endpoint",
+            headers=self.get_headers(),
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            return {
+                "success": True,
+                "data": response.json()
+            }
+        else:
+            return {
+                "error": f"API error: {response.status_code}",
+                "details": response.text
+            }
+    except Exception as e:
+        return {"error": f"Request failed: {str(e)}"}
+```
+
+**Request Handling:**
+```python
+elif method == "tools/call":
+    tool_name = params.get("name")
+    arguments = params.get("arguments", {})
+    
+    if tool_name == "your_tool":
+        result = await self.your_tool_method(arguments.get("param"))
+    else:
+        # Handle unknown tool error
+```
+
+#### Services to Implement
+
+Use the Notion example as a template for these common integrations:
+
+**Communication Platforms:**
+- Slack MCP (channels, messages, users)
+- Discord MCP (servers, channels, webhooks)
+- Microsoft Teams MCP (teams, channels, chats)
+
+**Project Management:**
+- Jira MCP (issues, projects, boards)
+- Linear MCP (issues, teams, projects)
+- GitHub Issues MCP (issues, PRs, repositories)
+
+**Databases:**
+- PostgreSQL MCP (queries, schema, data)
+- MongoDB MCP (collections, documents, aggregations)
+- Redis MCP (keys, values, pub/sub)
+
+**Cloud Services:**
+- AWS MCP (EC2, S3, Lambda)
+- GCP MCP (Compute, Storage, Functions)
+- Azure MCP (VMs, Blob Storage, Functions)
+
+#### Testing Your MCP
+
+1. **Unit Testing**: Test individual tool methods
+2. **Integration Testing**: Test with `any-mcp-cli`
+3. **End-to-End Testing**: Test through the web API
+
+```bash
+# Test tool listing
+any-mcp-cli call --script examples/your_mcp.py --tool health_check
+
+# Test specific functionality
+any-mcp-cli call --script examples/your_mcp.py --tool your_main_tool --args param=test
+
+# Test with natural language
+any-mcp-cli nl --script examples/your_mcp.py --query "do something with test data"
+```
+
 ## Development
 
 ### Project Structure

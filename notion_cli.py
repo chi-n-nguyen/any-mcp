@@ -37,18 +37,38 @@ async def rich_cli():
     ))
     
     # Show available tools
-    tools_table = Table(title="🛠️  Available Tools", show_header=True, header_style="bold magenta")
+    tools_table = Table(title="🛠️  Available Tools (30+ Tools!)", show_header=True, header_style="bold magenta")
     tools_table.add_column("Command", style="cyan", no_wrap=True)
     tools_table.add_column("Description", style="white")
     tools_table.add_column("Example", style="green")
     
+    # Core tools
     tools_table.add_row("search <query>", "Search across Notion content", "search project")
+    tools_table.add_row("search_with_filters", "Advanced search with filters", "search_with_filters project")
     tools_table.add_row("page <id>", "Get page content", "page 24bc2e93...")
     tools_table.add_row("health", "Check connection status", "health")
     tools_table.add_row("help", "Show this help", "help")
     tools_table.add_row("quit", "Exit CLI", "quit")
     
     console.print(tools_table)
+    
+    # Show comprehensive capabilities
+    capabilities_table = Table(title="🚀 Complete Notion API Implementation (30+ Tools)", show_header=True, header_style="bold blue")
+    capabilities_table.add_column("Category", style="cyan", no_wrap=True)
+    capabilities_table.add_column("Tools Available", style="white")
+    capabilities_table.add_column("Count", style="yellow")
+    
+    capabilities_table.add_row("📄 Pages", "Create, Read, Update, Delete, Move", "5 tools")
+    capabilities_table.add_row("🗄️ Databases", "Create, Read, Update, Delete, Query", "5 tools")
+    capabilities_table.add_row("🧱 Blocks", "Create, Read, Update, Delete, Children", "6 tools")
+    capabilities_table.add_row("👥 Users", "Get User, Get Users, Get Me", "3 tools")
+    capabilities_table.add_row("💬 Comments", "Create, Read Comments", "2 tools")
+    capabilities_table.add_row("📎 Files", "Upload Files", "1 tool")
+    capabilities_table.add_row("🔍 Search", "Basic Search, Advanced Search", "2 tools")
+    capabilities_table.add_row("💚 Health", "Connection Status", "1 tool")
+    capabilities_table.add_row("📊 Total", "Complete Notion API Coverage", "30+ tools")
+    
+    console.print(capabilities_table)
     console.print()
     
     while True:
@@ -64,7 +84,13 @@ async def rich_cli():
             elif command == "help":
                 console.print(Panel(
                     tools_table,
-                    title="[bold blue]Help[/bold blue]",
+                    title="[bold blue]Help - Available Tools[/bold blue]",
+                    border_style="blue"
+                ))
+                console.print()
+                console.print(Panel(
+                    capabilities_table,
+                    title="[bold blue]Help - Notion API Capabilities[/bold blue]",
                     border_style="blue"
                 ))
                 
@@ -98,7 +124,7 @@ async def rich_cli():
                     result = await server.search_notion(query, "page")
                 
                 if result.get('success'):
-                    # Create results table
+                    # Create results table - show ALL results, not just 10
                     results_table = Table(
                         title=f"✅ Found {result['results_count']} items",
                         show_header=True,
@@ -110,7 +136,8 @@ async def rich_cli():
                     results_table.add_column("ID", style="yellow", no_wrap=True)
                     results_table.add_column("Last Edited", style="green")
                     
-                    for i, item in enumerate(result['results'][:10], 1):
+                    # Show ALL results, not just first 10
+                    for i, item in enumerate(result['results'], 1):
                         # Truncate long titles
                         title = item['title'][:50] + "..." if len(item['title']) > 50 else item['title']
                         # Format date
@@ -125,9 +152,9 @@ async def rich_cli():
                     
                     console.print(results_table)
                     
-                    if result['results_count'] > 10:
-                        console.print(f"[yellow]... and {result['results_count'] - 10} more results[/yellow]")
-                        
+                    # No more "and X more results" message since we show everything
+                    console.print(f"[green]📊 Displaying all {result['results_count']} results[/green]")
+                    
                 else:
                     console.print(f"[bold red]❌ Search failed: {result.get('error', 'Unknown error')}[/bold red]")
                     

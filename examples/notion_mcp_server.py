@@ -151,10 +151,360 @@ class NotionMCPServer:
                         },
                         "content": {
                             "type": "string",
-                            "description": "Text content for the page"
+                            "description": "Text content for the page (optional)"
                         }
                     },
                     "required": ["parent_id", "title"]
+                }
+            },
+            {
+                "name": "update_page",
+                "description": "Update an existing Notion page",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_id": {
+                            "type": "string",
+                            "description": "ID of the page to update"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "New title (optional)"
+                        },
+                        "properties": {
+                            "type": "object",
+                            "description": "Properties to update (optional)"
+                        }
+                    },
+                    "required": ["page_id"]
+                }
+            },
+            {
+                "name": "delete_page",
+                "description": "Delete a Notion page",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_id": {
+                            "type": "string",
+                            "description": "ID of the page to delete"
+                        }
+                    },
+                    "required": ["page_id"]
+                }
+            },
+            {
+                "name": "move_page",
+                "description": "Move a page to a different parent",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_id": {
+                            "type": "string",
+                            "description": "ID of the page to move"
+                        },
+                        "new_parent_id": {
+                            "type": "string",
+                            "description": "ID of the new parent page or database"
+                        }
+                    },
+                    "required": ["page_id", "new_parent_id"]
+                }
+            },
+            {
+                "name": "create_database",
+                "description": "Create a new Notion database",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "parent_id": {
+                            "type": "string",
+                            "description": "ID of parent page or database"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "Title of the database"
+                        },
+                        "properties": {
+                            "type": "object",
+                            "description": "Database properties schema"
+                        }
+                    },
+                    "required": ["parent_id", "title"]
+                }
+            },
+            {
+                "name": "update_database",
+                "description": "Update an existing Notion database",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "database_id": {
+                            "type": "string",
+                            "description": "ID of the database to update"
+                        },
+                        "title": {
+                            "type": "string",
+                            "description": "New title (optional)"
+                        },
+                        "properties": {
+                            "type": "object",
+                            "description": "Properties to update (optional)"
+                        }
+                    },
+                    "required": ["database_id"]
+                }
+            },
+            {
+                "name": "delete_database",
+                "description": "Delete a Notion database",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "database_id": {
+                            "type": "string",
+                            "description": "ID of the database to delete"
+                        }
+                    },
+                    "required": ["database_id"]
+                }
+            },
+            {
+                "name": "query_database",
+                "description": "Advanced database query with filters and sorting",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "database_id": {
+                            "type": "string",
+                            "description": "ID of the database to query"
+                        },
+                        "filter": {
+                            "type": "object",
+                            "description": "Filter criteria (optional)"
+                        },
+                        "sorts": {
+                            "type": "array",
+                            "description": "Sorting criteria (optional)"
+                        },
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Number of results per page (optional)"
+                        }
+                    },
+                    "required": ["database_id"]
+                }
+            },
+            {
+                "name": "create_block",
+                "description": "Create a new content block in a page",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_id": {
+                            "type": "string",
+                            "description": "ID of the page to add block to"
+                        },
+                        "block_type": {
+                            "type": "string",
+                            "enum": ["paragraph", "heading_1", "heading_2", "heading_3", "bulleted_list_item", "numbered_list_item", "to_do", "toggle", "code", "quote", "callout", "divider", "image", "video", "file", "pdf", "bookmark", "equation", "table_of_contents", "breadcrumb", "link_preview", "template_button", "synced_block", "column_list", "column", "table", "table_row", "embed", "equation", "link_to_page", "audio", "unsupported"],
+                            "description": "Type of block to create"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Text content for the block"
+                        }
+                    },
+                    "required": ["page_id", "block_type", "content"]
+                }
+            },
+            {
+                "name": "update_block",
+                "description": "Update an existing content block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "block_id": {
+                            "type": "string",
+                            "description": "ID of the block to update"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "New content for the block"
+                        }
+                    },
+                    "required": ["block_id", "content"]
+                }
+            },
+            {
+                "name": "delete_block",
+                "description": "Delete a content block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "block_id": {
+                            "type": "string",
+                            "description": "ID of the block to delete"
+                        }
+                    },
+                    "required": ["block_id"]
+                }
+            },
+            {
+                "name": "get_block_children",
+                "description": "Get all child blocks of a page or block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "block_id": {
+                            "type": "string",
+                            "description": "ID of the page or block"
+                        },
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Number of results per page (optional)"
+                        }
+                    },
+                    "required": ["block_id"]
+                }
+            },
+            {
+                "name": "append_block_children",
+                "description": "Add multiple blocks to a page or block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "block_id": {
+                            "type": "string",
+                            "description": "ID of the page or block to add to"
+                        },
+                        "blocks": {
+                            "type": "array",
+                            "description": "Array of block objects to add"
+                        }
+                    },
+                    "required": ["block_id", "blocks"]
+                }
+            },
+            {
+                "name": "get_user",
+                "description": "Get information about a specific user",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "user_id": {
+                            "type": "string",
+                            "description": "ID of the user to retrieve"
+                        }
+                    },
+                    "required": ["user_id"]
+                }
+            },
+            {
+                "name": "get_users",
+                "description": "Get list of all users in the workspace",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Number of results per page (optional)"
+                        }
+                    },
+                    "required": []
+                }
+            },
+            {
+                "name": "get_me",
+                "description": "Get information about the current user",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {},
+                    "required": []
+                }
+            },
+            {
+                "name": "create_comment",
+                "description": "Create a comment on a page or block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "parent_id": {
+                            "type": "string",
+                            "description": "ID of the page or block to comment on"
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Comment text content"
+                        }
+                    },
+                    "required": ["parent_id", "content"]
+                }
+            },
+            {
+                "name": "get_comments",
+                "description": "Get all comments for a page or block",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "block_id": {
+                            "type": "string",
+                            "description": "ID of the page or block"
+                        },
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Number of results per page (optional)"
+                        }
+                    },
+                    "required": ["block_id"]
+                }
+            },
+            {
+                "name": "upload_file",
+                "description": "Upload a file to Notion",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "page_id": {
+                            "type": "string",
+                            "description": "ID of the page to upload to"
+                        },
+                        "file_path": {
+                            "type": "string",
+                            "description": "Path to the file to upload"
+                        },
+                        "caption": {
+                            "type": "string",
+                            "description": "Caption for the file (optional)"
+                        }
+                    },
+                    "required": ["page_id", "file_path"]
+                }
+            },
+            {
+                "name": "search_with_filters",
+                "description": "Advanced search with multiple filters and options",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Search query string"
+                        },
+                        "filter": {
+                            "type": "object",
+                            "description": "Complex filter object (optional)"
+                        },
+                        "sort": {
+                            "type": "object",
+                            "description": "Sorting criteria (optional)"
+                        },
+                        "page_size": {
+                            "type": "integer",
+                            "description": "Number of results per page (optional)"
+                        }
+                    },
+                    "required": ["query"]
                 }
             },
             {
@@ -198,7 +548,7 @@ class NotionMCPServer:
             url = f"{NOTION_BASE_URL}/search"
             payload = {
                 "query": query,
-                "page_size": 20
+                "page_size": 100  # Increased from 20 to 100 for more comprehensive results
             }
             
             if filter_type:

@@ -58,12 +58,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Notion API configuration
-NOTION_API_TOKEN = os.getenv("NOTION_API_TOKEN") or os.getenv("NOTION_API_KEY")
 NOTION_API_VERSION = "2022-06-28"
 NOTION_BASE_URL = "https://api.notion.com/v1"
 
-if not NOTION_API_TOKEN:
-    logger.warning("NOTION_API_TOKEN not found. Set it as an environment variable.")
+def get_notion_token():
+    """Get Notion API token dynamically"""
+    return os.getenv("NOTION_API_TOKEN") or os.getenv("NOTION_API_KEY")
 
 
 class NotionMCPServer:
@@ -170,8 +170,11 @@ class NotionMCPServer:
     
     def get_notion_headers(self) -> Dict[str, str]:
         """Get standard headers for Notion API requests."""
+        token = get_notion_token()
+        if not token:
+            raise ValueError("NOTION_API_TOKEN not configured")
         return {
-            "Authorization": f"Bearer {NOTION_API_TOKEN}",
+            "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
             "Notion-Version": NOTION_API_VERSION
         }
@@ -187,7 +190,8 @@ class NotionMCPServer:
         Returns:
             Dict containing search results
         """
-        if not NOTION_API_TOKEN:
+        token = get_notion_token()
+        if not token:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
@@ -245,7 +249,8 @@ class NotionMCPServer:
         Returns:
             Dict containing page content
         """
-        if not NOTION_API_TOKEN:
+        token = get_notion_token()
+        if not token:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
@@ -301,7 +306,8 @@ class NotionMCPServer:
         Returns:
             Dict containing database contents
         """
-        if not NOTION_API_TOKEN:
+        token = get_notion_token()
+        if not token:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
@@ -365,7 +371,8 @@ class NotionMCPServer:
         Returns:
             Dict containing creation result
         """
-        if not NOTION_API_TOKEN:
+        token = get_notion_token()
+        if not token:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
@@ -435,7 +442,8 @@ class NotionMCPServer:
         Returns:
             Dict containing health status
         """
-        if not NOTION_API_TOKEN:
+        token = get_notion_token()
+        if not token:
             return {
                 "healthy": False,
                 "error": "NOTION_API_TOKEN not configured",
@@ -642,7 +650,8 @@ async def main():
     server = NotionMCPServer()
     
     logger.info("Notion MCP Server starting...")
-    logger.info(f"Notion API configured: {'Yes' if NOTION_API_TOKEN else 'No'}")
+    token = get_notion_token()
+    logger.info(f"Notion API configured: {'Yes' if token else 'No'}")
     
     while True:
         try:

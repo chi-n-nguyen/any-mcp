@@ -16,14 +16,14 @@ from rich.columns import Columns
 from rich.align import Align
 from rich import box
 
+# Set up environment variables at module level
+os.environ["NOTION_API_TOKEN"] = "secret_Ys8Vd37lj1WMuMWz0lx0WkW88yRz4NBbj4XH5PiseC4"
+
 # Create rich console
 console = Console()
 
 async def rich_cli():
-    # Set up your API key
-    os.environ["NOTION_API_TOKEN"] = "secret_Ys8Vd37lj1WMuMWz0lx0WkW88yRz4NBbj4XH5PiseC4"
-    
-    # Create server
+    # Create server (environment already set)
     server = NotionMCPServer()
     
     # Welcome banner

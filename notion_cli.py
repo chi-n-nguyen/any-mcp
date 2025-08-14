@@ -88,6 +88,33 @@ async def rich_cli():
                     border_style="blue"
                 ))
                 console.print()
+                
+                # Show CLI commands
+                cli_commands = Table(title="[bold blue]Help - CLI Commands[/bold blue]", show_header=True, header_style="bold blue")
+                cli_commands.add_column("Command", style="cyan", no_wrap=True)
+                cli_commands.add_column("Usage", style="white")
+                cli_commands.add_column("Description", style="green")
+                
+                cli_commands.add_row("health", "", "Check Notion connection")
+                cli_commands.add_row("search <query>", "search project", "Search for content")
+                cli_commands.add_row("search_with_filters <query>", "search_with_filters project", "Advanced search")
+                cli_commands.add_row("page <id>", "page 24bc2e93...", "Get page content")
+                cli_commands.add_row("create_page <parent_id> <title>", "create_page parent123 MyPage", "Create new page")
+                cli_commands.add_row("update_page <id>", "update_page page123", "Update page")
+                cli_commands.add_row("delete_page <id>", "delete_page page123", "Delete page")
+                cli_commands.add_row("move_page <id> <new_parent>", "move_page page123 parent456", "Move page")
+                cli_commands.add_row("create_database <parent_id> <title>", "create_database parent123 MyDB", "Create database")
+                cli_commands.add_row("query_database <id>", "query_database db123", "Query database")
+                cli_commands.add_row("create_block <page_id> <type> <content>", "create_block page123 paragraph Hello", "Create block")
+                cli_commands.add_row("get_users", "", "Get all users")
+                cli_commands.add_row("get_me", "", "Get current user")
+                cli_commands.add_row("create_comment <parent_id> <content>", "create_comment page123 Great work!", "Create comment")
+                cli_commands.add_row("upload_file <page_id> <path> <caption>", "upload_file page123 file.pdf My file", "Upload file")
+                cli_commands.add_row("help", "", "Show this help")
+                cli_commands.add_row("quit", "", "Exit CLI")
+                
+                console.print(cli_commands)
+                console.print()
                 console.print(Panel(
                     capabilities_table,
                     title="[bold blue]Help - Notion API Capabilities[/bold blue]",
@@ -154,9 +181,153 @@ async def rich_cli():
                     
                     # No more "and X more results" message since we show everything
                     console.print(f"[green]📊 Displaying all {result['results_count']} results[/green]")
-                    
+                        
                 else:
                     console.print(f"[bold red]❌ Search failed: {result.get('error', 'Unknown error')}[/bold red]")
+                    
+            elif command.startswith("search_with_filters "):
+                query = command[20:]  # Remove "search_with_filters " prefix
+                console.print(f"[bold blue]🔍 Advanced search for:[/bold blue] [cyan]{query}[/cyan]")
+                console.print("[yellow]Note: Advanced search with filters not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("create_page "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    parent_id = parts[1]
+                    title = parts[2]
+                    console.print(f"[bold blue]📄 Creating page:[/bold blue] [cyan]{title}[/cyan]")
+                    console.print(f"[yellow]Note: Page creation not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: create_page <parent_id> <title>[/red]")
+                    
+            elif command.startswith("update_page "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 2:
+                    page_id = parts[1]
+                    console.print(f"[bold blue]✏️ Updating page:[/bold blue] [cyan]{page_id}[/cyan]")
+                    console.print(f"[yellow]Note: Page update not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: update_page <page_id>[/red]")
+                    
+            elif command.startswith("delete_page "):
+                page_id = command[12:]  # Remove "delete_page " prefix
+                console.print(f"[bold red]🗑️ Deleting page:[/bold red] [cyan]{page_id}[/cyan]")
+                console.print(f"[yellow]Note: Page deletion not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("move_page "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    page_id = parts[1]
+                    new_parent_id = parts[2]
+                    console.print(f"[bold blue]🔄 Moving page:[/bold blue] [cyan]{page_id}[/cyan]")
+                    console.print(f"[yellow]Note: Page move not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: move_page <page_id> <new_parent_id>[/red]")
+                    
+            elif command.startswith("create_database "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    parent_id = parts[1]
+                    title = parts[2]
+                    console.print(f"[bold blue]🗄️ Creating database:[/bold blue] [cyan]{title}[/cyan]")
+                    console.print(f"[yellow]Note: Database creation not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: create_database <parent_id> <title>[/red]")
+                    
+            elif command.startswith("update_database "):
+                database_id = command[16:]  # Remove "update_database " prefix
+                console.print(f"[bold blue]✏️ Updating database:[/bold blue] [cyan]{database_id}[/cyan]")
+                console.print(f"[yellow]Note: Database update not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("delete_database "):
+                database_id = command[16:]  # Remove "delete_database " prefix
+                console.print(f"[bold red]🗑️ Deleting database:[/bold red] [cyan]{database_id}[/cyan]")
+                console.print(f"[yellow]Note: Database deletion not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("query_database "):
+                database_id = command[15:]  # Remove "query_database " prefix
+                console.print(f"[bold blue]🔍 Querying database:[/bold blue] [cyan]{database_id}[/cyan]")
+                console.print(f"[yellow]Note: Advanced database query not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("create_block "):
+                parts = command.split(" ", 3)
+                if len(parts) >= 4:
+                    page_id = parts[1]
+                    block_type = parts[2]
+                    content = parts[3]
+                    console.print(f"[bold blue]🧱 Creating block:[/bold blue] [cyan]{block_type}[/cyan]")
+                    console.print(f"[yellow]Note: Block creation not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: create_block <page_id> <block_type> <content>[/red]")
+                    
+            elif command.startswith("update_block "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    block_id = parts[1]
+                    content = parts[2]
+                    console.print(f"[bold blue]✏️ Updating block:[/bold blue] [cyan]{block_id}[/cyan]")
+                    console.print(f"[yellow]Note: Block update not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: update_block <block_id> <content>[/red]")
+                    
+            elif command.startswith("delete_block "):
+                block_id = command[13:]  # Remove "delete_block " prefix
+                console.print(f"[bold red]🗑️ Deleting block:[/bold red] [cyan]{block_id}[/cyan]")
+                console.print(f"[yellow]Note: Block deletion not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("get_block_children "):
+                block_id = command[19:]  # Remove "get_block_children " prefix
+                console.print(f"[bold blue]🧱 Getting block children:[/bold blue] [cyan]{block_id}[/cyan]")
+                console.print(f"[yellow]Note: Block children not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("append_block_children "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    block_id = parts[1]
+                    blocks = parts[2]
+                    console.print(f"[bold blue]➕ Appending blocks:[/bold blue] [cyan]{block_id}[/cyan]")
+                    console.print(f"[yellow]Note: Block append not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: append_block_children <block_id> <blocks>[/red]")
+                    
+            elif command.startswith("get_user "):
+                user_id = command[9:]  # Remove "get_user " prefix
+                console.print(f"[bold blue]👤 Getting user:[/bold blue] [cyan]{user_id}[/cyan]")
+                console.print(f"[yellow]Note: User retrieval not yet implemented in CLI[/yellow]")
+                
+            elif command == "get_users":
+                console.print("[bold blue]👥 Getting all users[/bold blue]")
+                console.print(f"[yellow]Note: Users list not yet implemented in CLI[/yellow]")
+                
+            elif command == "get_me":
+                console.print("[bold blue]👤 Getting current user[/bold blue]")
+                console.print(f"[yellow]Note: Current user not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("create_comment "):
+                parts = command.split(" ", 2)
+                if len(parts) >= 3:
+                    parent_id = parts[1]
+                    content = parts[2]
+                    console.print(f"[bold blue]💬 Creating comment:[/bold blue] [cyan]{parent_id}[/cyan]")
+                    console.print(f"[yellow]Note: Comment creation not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: create_comment <parent_id> <content>[/red]")
+                    
+            elif command.startswith("get_comments "):
+                block_id = command[13:]  # Remove "get_comments " prefix
+                console.print(f"[bold blue]💬 Getting comments:[/bold blue] [cyan]{block_id}[/cyan]")
+                console.print(f"[yellow]Note: Comments retrieval not yet implemented in CLI[/yellow]")
+                
+            elif command.startswith("upload_file "):
+                parts = command.split(" ", 3)
+                if len(parts) >= 4:
+                    page_id = parts[1]
+                    file_path = parts[2]
+                    caption = parts[3]
+                    console.print(f"[bold blue]📎 Uploading file:[/bold blue] [cyan]{file_path}[/cyan]")
+                    console.print(f"[yellow]Note: File upload not yet implemented in CLI[/yellow]")
+                else:
+                    console.print("[red]Usage: upload_file <page_id> <file_path> <caption>[/red]")
                     
             elif command.startswith("page "):
                 page_id = command[5:]  # Remove "page " prefix

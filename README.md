@@ -9,13 +9,15 @@ A production-ready, universal Model Context Protocol (MCP) client that seamlessl
 ## Key Features
 
 - **Universal MCP Client**: Connect to any MCP server (Docker, local, registry)
+- **🔌 Third-Party Extensible**: Build custom MCP clients and servers
 - **Rich Interactive CLI**: Beautiful, intuitive command-line interface
 - **Web API**: RESTful API for programmatic access
-- **Multi-LLM Support**: Claude, Gemini, and more
+- **Multi-LLM Support**: Claude, Gemini, and custom LLM integrations
+- **Plugin Architecture**: Extensible framework for third-party tools
 - **Auto-discovery**: Automatically detect and configure MCP servers
 - **Production Ready**: Error handling, logging, health checks
 - **Complete Notion Integration**: Official Notion MCP server with 30+ tools
-- **Demo Calculator**: Built-in testing and demonstration tools
+- **Community Ecosystem**: Support for third-party MCP servers and clients
 
 ## Core Components
 
@@ -33,6 +35,73 @@ A production-ready, universal Model Context Protocol (MCP) client that seamlessl
 - **Local Script**: `local://./path/to/script.py`
 - **Docker Image**: `docker://image:tag`
 - **Registry**: `registry://name` (coming soon)
+
+## 🏗️ Architecture
+
+Any-MCP is built with extensibility at its core, designed to support third-party integrations at every level:
+
+### 🔌 Third-Party Integration Points
+
+#### **Custom MCP Clients**
+- Build your own MCP client implementations
+- Use the provided Client SDK and API wrappers
+- Integrate with existing applications via Web API
+- Language bindings for Python, JavaScript, and more
+
+#### **Custom MCP Servers** 
+- Create domain-specific MCP servers for your use case
+- Examples: Slack, Discord, databases, analytics tools
+- Use any programming language that supports MCP protocol
+- Register in the community MCP registry
+
+#### **Plugin Architecture**
+- Extend core functionality with plugins
+- Custom protocol adapters for proprietary systems
+- Third-party LLM model integrations
+- Custom UI implementations
+
+### 🎯 Core Architecture Layers
+
+1. **User Interface Layer**: CLI, Web API, Custom UIs
+2. **Application Layer**: Chat systems, tool orchestration  
+3. **LLM Services**: Claude, Gemini, Custom models
+4. **MCP Management**: Lifecycle, health, plugin management
+5. **MCP Core**: Extensible client framework with protocol adapters
+6. **Server Ecosystem**: Official and third-party MCP servers
+
+### 🌍 Extensibility Examples
+
+**Enterprise Integration:**
+```python
+# Custom enterprise MCP client
+from any_mcp import MCPClient, ProtocolAdapter
+
+class EnterpriseClient(MCPClient):
+    def __init__(self, internal_api_endpoint):
+        super().__init__(custom_adapter=EnterpriseAdapter())
+```
+
+**Third-Party Server:**
+```yaml
+# mcp_config.yaml
+installed_mcps:
+  slack-integration:
+    type: "docker"
+    source: "community/slack-mcp-server:latest"
+    description: "Community-built Slack MCP server"
+    env_vars:
+      SLACK_TOKEN: "${SLACK_BOT_TOKEN}"
+    enabled: true
+```
+
+**Custom Protocol:**
+```python
+# Custom protocol adapter
+class CustomProtocolAdapter(ProtocolAdapter):
+    async def handle_custom_protocol(self, message):
+        # Your custom protocol logic
+        return await self.process_message(message)
+```
 
 ## Installation
 

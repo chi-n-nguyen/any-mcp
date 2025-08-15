@@ -16,8 +16,16 @@ from rich.columns import Columns
 from rich.align import Align
 from rich import box
 
-# Set up environment variables at module level
-os.environ["NOTION_API_TOKEN"] = "secret_Ys8Vd37lj1WMuMWz0lx0WkW88yRz4NBbj4XH5PiseC4"
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# Verify NOTION_API_TOKEN is set
+notion_token = os.getenv("NOTION_API_TOKEN")
+if not notion_token:
+    print("❌ Error: NOTION_API_TOKEN environment variable not set!")
+    print("Please create a .env file with: NOTION_API_TOKEN=your_token_here")
+    exit(1)
 
 # Create rich console
 console = Console()

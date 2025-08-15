@@ -2,7 +2,7 @@
 
 A universal adapter that safely starts any MCP package, discovers available tools, and provides a unified interface for users and LLMs to interact with them through a single, standardized API.
 
-> **First Production Release v1.0.0** - Ready for LLMgine integration with full MCP protocol compliance, multi-LLM support, and production-ready deployment.
+> **Production Release v1.0.0** - Ready for enterprise deployment with full MCP protocol compliance, multi-LLM support, and comprehensive Notion API integration featuring 30+ tools.
 
 ## Mission
 
@@ -10,14 +10,15 @@ Build **one adapter layer** that lets LLMs plug-and-play with *any* third-party 
 
 ## Key Features
 
-- **Natural Language Interface**: Talk to any MCP using plain English - no API knowledge needed
-- **Universal Adapter**: One interface for all MCPs regardless of underlying implementation
-- **Auto-Discovery**: Automatically detect and catalog available tools from any MCP
-- **Multi-Source Installation**: Install MCPs from Docker, local files, or registry modules
-- **Polished CLI**: Modern command-line interface with subcommands for all operations
-- **Web API**: RESTful interface for remote MCP management and tool calling
-- **Multi-LLM Support**: Optional LLM-powered chat mode with Claude and Gemini support for advanced natural language processing
-- **Production Ready**: Includes configuration management, logging, and cleanup
+- **🗣️ Natural Language Interface**: Talk to any MCP using plain English - no API knowledge needed
+- **🔄 Universal Adapter**: One interface for all MCPs regardless of underlying implementation  
+- **🔍 Auto-Discovery**: Automatically detect and catalog available tools from any MCP
+- **📦 Multi-Source Installation**: Install MCPs from Docker, local files, Python modules, or Git repositories
+- **🎨 Rich Interactive CLI**: Beautiful command-line interface with colorful output and real-time feedback
+- **🌐 Web API**: RESTful interface for remote MCP management and tool calling
+- **🤖 Multi-LLM Support**: Claude and Gemini integration for advanced natural language processing
+- **📊 Complete Notion Integration**: 30+ tools covering Pages, Databases, Blocks, Users, Comments, Files, and Search
+- **🔧 Production Ready**: Configuration management, health monitoring, error handling, and logging
 
 ## Architecture
 
@@ -73,16 +74,29 @@ graph TD
 
 ### Core Components
 
-1. **CLI Interface** (`any_mcp/cli/main.py`) - Command-line interface with natural language processing for tool calls
-2. **Core Engine** (`any_mcp/main.py`) - Main application logic and MCP orchestration
-3. **MCP Manager** (`any_mcp/managers/manager.py`) - Lifecycle management, health monitoring, and tool orchestration
-4. **MCP Installer** (`any_mcp/managers/installer.py`) - Multi-source MCP package installer (Docker, local files, Python modules)
-5. **MCP Client** (`any_mcp/core/client.py`) - Enhanced client with tool discovery and calling capabilities
-6. **Web API** (`any_mcp/api/web_mcp.py`) - FastAPI-based HTTP interface for remote MCP operations
-7. **LLM Integration** (`any_mcp/core/claude.py`, `any_mcp/core/gemini.py`) - Claude and Gemini support for natural language processing
-8. **Tool Management** (`any_mcp/core/tools.py`) - Centralized tool discovery and management across all MCPs
-9. **Chat Interface** (`any_mcp/core/chat.py`, `any_mcp/core/cli_chat.py`) - LLM-powered chat and conversation management
-10. **Server Connector** (`any_mcp/servers/connect_server.py`) - Flexible server connection interface
+1. **🎯 CLI Interface** (`any_mcp/cli/main.py`) - Polished command-line interface with 8 main commands:
+   - `list` - List configured MCP servers and their status
+   - `install` - Install MCPs from multiple sources (Docker, local, module)
+   - `start/stop` - Lifecycle management for MCP servers
+   - `tools` - Discover available tools from any MCP server
+   - `call` - Direct tool execution with structured arguments
+   - `chat` - Interactive chat mode with LLM integration
+   - `nl` - Natural language command processing
+
+2. **⚙️ Core Engine** (`any_mcp/main.py`) - Main application logic and MCP orchestration
+3. **📊 MCP Manager** (`any_mcp/managers/manager.py`) - Lifecycle management, health monitoring, and tool orchestration
+4. **📦 MCP Installer** (`any_mcp/managers/installer.py`) - Multi-source installation supporting:
+   - Docker images (`docker://image:tag`)
+   - Local scripts (`local://path/to/script.py`)
+   - Python modules (`module://package-name`)
+   - Git repositories (planned)
+
+5. **🔌 MCP Client** (`any_mcp/core/client.py`) - Enhanced client with tool discovery and calling capabilities
+6. **🌐 Web API** (`any_mcp/api/web_mcp.py`) - FastAPI-based HTTP interface for remote operations
+7. **🤖 LLM Integration** (`any_mcp/core/claude.py`, `any_mcp/core/gemini.py`) - Multi-LLM support for natural language processing
+8. **🛠️ Tool Management** (`any_mcp/core/tools.py`) - Centralized tool discovery and management
+9. **💬 Chat Interface** (`any_mcp/core/chat.py`, `any_mcp/core/cli_chat.py`) - Interactive conversation management
+10. **🔗 Server Connector** (`any_mcp/servers/connect_server.py`) - Flexible server connection interface
 
 ## Quick Start
 
@@ -97,34 +111,38 @@ cd any-mcp
 pip install -e .
 
 # Copy example configuration
-cp config/example_mcp_config.yaml config/mcp_config.yaml
+cp yaml_config/example_mcp_config.yaml yaml_config/mcp_config.yaml
 
-# Set environment variables (optional)
+# Set environment variables (optional for enhanced features)
 export GITHUB_TOKEN=your_github_token_here
+export NOTION_API_TOKEN=your_notion_token_here
+export ANTHROPIC_API_KEY=your_claude_key_here  # For LLM features
 export USE_UV=1  # Use uv for faster Python execution
+```
 
-### Using the Rich Notion MCP CLI
+### 🎨 Rich Interactive Notion CLI
 
-Experience a beautiful, interactive interface for your Notion MCP:
+Experience the flagship feature - a beautiful, interactive interface for Notion with **30+ tools**:
 
 ```bash
-# Run the rich CLI
+# Run the rich Notion CLI
 python3 notion_cli.py
 
 # Available commands:
-#   search <query> - Search across Notion content
-#   page <id> - Get page content details
-#   health - Check connection status
-#   help - Show available tools
+#   search <query> - Search across all Notion content
+#   page <id> - Get detailed page content
+#   health - Check API connection status
+#   help - Show complete tool capabilities
 #   quit - Exit CLI
 ```
 
-The rich CLI features:
+**Rich CLI Features:**
 - 🎨 **Beautiful UI**: Colorful tables, panels, and status indicators
-- 📊 **Rich Tables**: Formatted search results with pagination
-- 🔍 **Interactive Search**: Real-time search across your Notion workspace
-- 📄 **Page Details**: Rich page information display
-- 💚 **Health Monitoring**: Connection status with user details
+- 📊 **Complete Coverage**: 30+ tools across Pages, Databases, Blocks, Users, Comments, Files, Search
+- 🔍 **Real-time Search**: Interactive search across your entire Notion workspace
+- 📄 **Rich Details**: Comprehensive page and database information display
+- 💚 **Health Monitoring**: Connection status with detailed user information
+- 🚀 **Production Ready**: Full Notion API implementation for enterprise use
 
 ### Quick Start with v1.0.0 Release
 
@@ -139,35 +157,45 @@ pip install -e .
 python main.py
 ```
 
-### Basic Usage
+### 🚀 Basic Usage
 
-#### 1. Natural Language CLI (Recommended)
+#### 1. 🎯 Core CLI Commands
 
 ```bash
-# Natural language tool call via configured MCPs
-any-mcp-cli nl --module mcp_server_git --query "show git status repo_path=."
+# List all configured MCP servers
+python3 -m any_mcp.cli.main list
 
-# Explicit tool calls
-any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
+# Install MCPs from various sources
+python3 -m any_mcp.cli.main install --name notion --source local://examples/notion_mcp_server.py --desc "Notion API integration"
+python3 -m any_mcp.cli.main install --name github --source docker://ghcr.io/github/github-mcp-server --desc "GitHub operations"
 
-# Interactive chat (requires Claude or Gemini API key)
-any-mcp-cli chat --module mcp_server_git
+# Start/stop MCP servers
+python3 -m any_mcp.cli.main start --server notion
+python3 -m any_mcp.cli.main tools --server notion
+python3 -m any_mcp.cli.main stop --server notion
+
+# Direct tool calls
+python3 -m any_mcp.cli.main call --server notion --tool search_notion --args query="project documentation"
+python3 -m any_mcp.cli.main call --script examples/notion_mcp_server.py --tool health_check
+
+# Natural language interface (AI-powered)
+python3 -m any_mcp.cli.main nl --server notion --query "search for all pages about AI projects"
+
+# Interactive chat mode
+python3 -m any_mcp.cli.main chat --server notion
 ```
 
-#### 2. Server Management
+#### 2. 🎨 Interactive Rich CLI (Recommended)
 
 ```bash
-# List configured servers
-any-mcp-cli list
+# Launch the beautiful Notion interface
+python3 notion_cli.py
 
-# Install and configure MCPs
-any-mcp-cli install --name docs --source local://my_mcp.py --desc "Document operations"
-any-mcp-cli install --name git --source docker://git-mcp-image --desc "Git operations"
-
-# Start/stop servers
-any-mcp-cli start --server docs
-any-mcp-cli tools --server docs
-any-mcp-cli stop --server docs
+# Commands within the interface:
+#   search <query> - Find content across Notion
+#   page <page-id> - Get detailed page information  
+#   health - Check connection and API status
+#   help - Show all 30+ available tools
 ```
 
 #### 3. Web API Server
@@ -234,96 +262,124 @@ curl -X POST http://localhost:8000/mcp/git/call \
 curl http://localhost:8000/mcp/git/health
 ```
 
-## Configuration
+## 📋 Configuration
 
-Create a `config/mcp_config.yaml` file to define your MCPs:
+Create a `yaml_config/mcp_config.yaml` file to define your MCPs. The system comes with pre-configured examples:
 
 ```yaml
 installed_mcps:
+  # GitHub Integration
   github:
     type: "docker"
     source: "ghcr.io/github/github-mcp-server"
-    description: "GitHub's official MCP server"
+    description: "GitHub's official MCP server for repository operations"
     env_vars:
       GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+      GITHUB_TOOLSETS: "all"
+    enabled: true
+
+  # Notion Integration (30+ tools)
+  notion:
+    type: "local"
+    source: "./examples/notion_mcp_server.py"
+    description: "Complete Notion API implementation with 30+ tools"
+    env_vars:
+      NOTION_API_TOKEN: "${NOTION_API_TOKEN}"
+    enabled: true
+
+  # Calculator Demo
+  calculator:
+    type: "local"
+    source: "./mcps/demo_calculator.py"
+    description: "Simple calculator MCP for mathematical operations"
+    env_vars: {}
     enabled: true
 
   # Add your custom MCPs here
-  # my_mcp:
+  # my_service:
   #   type: "local"
   #   source: "./my_custom_mcp.py"
-  #   description: "My custom MCP server"
+  #   description: "My custom service integration"
+  #   env_vars:
+  #     API_KEY: "${MY_SERVICE_API_KEY}"
   #   enabled: true
 ```
 
-## Supported MCP Sources
+## 📦 Supported MCP Sources
 
-### Python Module MCPs
+### 1. Local Script MCPs (Recommended for Development)
 ```bash
-# Use Python modules directly (recommended for community MCPs)
-any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
-any-mcp-cli nl --module mcp_server_filesystem --query "list files path=/tmp"
+# Use local Python scripts directly
+python3 -m any_mcp.cli.main call --script examples/notion_mcp_server.py --tool search_notion --args query="projects"
+python3 -m any_mcp.cli.main nl --script examples/notion_mcp_server.py --query "find all pages about AI"
 ```
 
-### Docker MCPs
+### 2. Docker MCPs (Production Ready)
 ```bash
 # Install from Docker registry
-any-mcp-cli install --name github --source docker://ghcr.io/github/github-mcp-server
-any-mcp-cli call --docker ghcr.io/github/github-mcp-server --tool search_repos --args query=python
+python3 -m any_mcp.cli.main install --name github --source docker://ghcr.io/github/github-mcp-server
+python3 -m any_mcp.cli.main call --docker ghcr.io/github/github-mcp-server --tool search_repos --args query=python
 ```
 
-### Local Script MCPs
+### 3. Python Module MCPs (Community MCPs)
 ```bash
-# Use local Python scripts
-any-mcp-cli call --script my_local_mcp.py --tool read_document --args doc_id=plan.md
-any-mcp-cli nl --script custom_mcp.py --query "process data: input=test.csv"
+# Use community MCP packages
+pip install mcp-server-git
+python3 -m any_mcp.cli.main call --module mcp_server_git --tool git_status --args repo_path=.
+python3 -m any_mcp.cli.main nl --module mcp_server_git --query "show git status"
 ```
 
-### Registry MCPs (Future)
+### 4. Configured Server MCPs (Managed)
 ```bash
-# Install from MCP registry (planned)
-python any_mcp_cli.py install --name financial --source registry://financial-data-mcp
+# Use pre-configured servers from mcp_config.yaml
+python3 -m any_mcp.cli.main start --server notion
+python3 -m any_mcp.cli.main call --server notion --tool search_notion --args query="documentation"
 ```
 
-## Examples and Demos
+## 🎯 Examples and Demos
 
-### Quick Start Examples
+### 🚀 Flagship Notion Demo
+
+Experience the complete power of the any-mcp system:
 
 ```bash
-# External Git MCP operations
-python -m pip install mcp-server-git
-any-mcp-cli call --module mcp_server_git --tool git_status --args repo_path=.
+# Interactive rich CLI (recommended)
+python3 notion_cli.py
 
-# Community filesystem MCP
-python -m pip install mcp-server-filesystem  
-any-mcp-cli nl --module mcp_server_filesystem --query "list directory contents path=."
+# Or use direct CLI commands
+python3 -m any_mcp.cli.main call --script examples/notion_mcp_server.py --tool search_notion --args query="AI projects"
+python3 -m any_mcp.cli.main nl --script examples/notion_mcp_server.py --query "find all pages about documentation"
 ```
 
-### Available Community MCPs
+### 🔧 Community MCP Integration
 
 Install and use any MCP from the [official servers repository](https://github.com/modelcontextprotocol/servers):
 
 ```bash
 # Git operations
 pip install mcp-server-git
-python any_mcp_cli.py call --module mcp_server_git --tool git_log --args repo_path=.
+python3 -m any_mcp.cli.main call --module mcp_server_git --tool git_status --args repo_path=.
 
 # Filesystem operations  
 pip install mcp-server-filesystem
-python any_mcp_cli.py call --module mcp_server_filesystem --tool read_file --args path=README.md
+python3 -m any_mcp.cli.main call --module mcp_server_filesystem --tool read_file --args path=README.md
 
 # Database operations
 pip install mcp-server-sqlite
-python any_mcp_cli.py call --module mcp_server_sqlite --tool execute_query --args query="SELECT * FROM users"
+python3 -m any_mcp.cli.main call --module mcp_server_sqlite --tool execute_query --args query="SELECT * FROM users"
 
-# Notion workspace integration (via official Notion MCP)
-# 1) Ensure `config/mcp_config.yaml` has the `notion` server (see Configuration section)
-# 2) Set the NOTION_API_TOKEN/NOTION_API_KEY env vars
-# 3) List tools and call one
-any-mcp-cli list
-any-mcp-cli tools --server notion
-any-mcp-cli call --server notion --tool TOOL_NAME --args key=value
-any-mcp-cli nl --server notion --query "search query=project notes"
+# Pre-configured server management
+python3 -m any_mcp.cli.main list
+python3 -m any_mcp.cli.main tools --server notion
+python3 -m any_mcp.cli.main call --server notion --tool search_notion --args query="project notes"
+```
+
+### 🧮 Calculator Demo
+
+Simple example for learning MCP development:
+
+```bash
+python3 -m any_mcp.cli.main call --script mcps/demo_calculator.py --tool add --args a=5,b=3
 ```
 
 ## Error Handling and Resilience
@@ -345,11 +401,23 @@ When running the web API, visit:
 
 ## Building Your Own MCP Server
 
-### Using the Notion MCP Example
+### 🚀 Flagship Example: Complete Notion Integration
 
-The repository includes a complete Notion MCP implementation at `examples/notion_mcp_server.py` that serves as a comprehensive template for building your own MCP servers. This example demonstrates all the essential patterns and best practices. 
+The repository features a **production-ready Notion MCP implementation** at `examples/notion_mcp_server.py` with **30+ tools** covering the entire Notion API. This serves as the flagship example demonstrating enterprise-grade MCP development.
 
-**Try the Rich CLI**: Run `python3 notion_cli.py` for a beautiful, interactive interface to test your Notion MCP!
+**🎨 Try the Rich CLI**: Run `python3 notion_cli.py` for a beautiful, interactive interface showcasing the full power of the any-mcp system!
+
+**📊 Complete API Coverage:**
+- **📄 Pages** (5 tools): Create, Read, Update, Delete, Move
+- **🗄️ Databases** (5 tools): Create, Read, Update, Delete, Query  
+- **🧱 Blocks** (6 tools): Create, Read, Update, Delete, Children, Append
+- **👥 Users** (3 tools): Get User, Get Users, Get Me
+- **💬 Comments** (2 tools): Create, Read Comments
+- **📎 Files** (1 tool): Upload Files
+- **🔍 Search** (2 tools): Basic Search, Advanced Search
+- **💚 Health** (1 tool): Connection Status
+
+This implementation demonstrates how to build **enterprise-ready MCP servers** with comprehensive API coverage.
 
 #### Key Components Demonstrated
 
@@ -492,71 +560,79 @@ any-mcp-cli nl --script examples/your_mcp.py --query "do something with test dat
 
 ## Development
 
-### Project Structure
+### 📁 Project Structure
 
 ```
-any_mcp/
-├── any_mcp/
-│   ├── api/               # Web API implementation
-│   │   └── web_mcp.py
-│   ├── core/              # Core functionality
-│   │   ├── chat.py
-│   │   ├── claude.py
-│   │   ├── gemini.py
-│   │   ├── cli_chat.py
-│   │   ├── cli.py
-│   │   ├── tools.py
-│   │   └── error_handling.py
-│   ├── managers/          # MCP lifecycle & installation
-│   │   ├── manager.py
-│   │   └── installer.py
-│   ├── servers/
-│   │   └── connect_server.py
-│   └── cli/
-│       └── main.py
-├── config/
-│   └── mcp_config.yaml
-├── main.py                # Entry point
-├── README.md
-├── LICENSE
-└── VERSION
+any-mcp/
+├── any_mcp/                    # Main package
+│   ├── api/                    # 🌐 Web API implementation
+│   │   └── web_mcp.py          # FastAPI server
+│   ├── cli/                    # 🎯 Command-line interface
+│   │   └── main.py             # Main CLI with 8 commands
+│   ├── core/                   # ⚙️ Core functionality
+│   │   ├── client.py           # MCP client implementation
+│   │   ├── chat.py             # Chat interface
+│   │   ├── claude.py           # Claude LLM integration
+│   │   ├── gemini.py           # Gemini LLM integration
+│   │   ├── tools.py            # Tool management
+│   │   └── error_handling.py   # Error handling utilities
+│   ├── managers/               # 📊 MCP lifecycle management
+│   │   ├── manager.py          # Server lifecycle
+│   │   └── installer.py        # Multi-source installation
+│   ├── servers/                # 🔗 Server connections
+│   │   └── connect_server.py   # Flexible connection interface
+│   └── main.py                 # Core engine
+├── examples/                   # 📚 Example implementations
+│   ├── notion_mcp_server.py    # Complete Notion integration (30+ tools)
+│   └── README.md               # Example documentation
+├── yaml_config/                # ⚙️ Configuration
+│   ├── mcp_config.yaml         # Main configuration
+│   └── example_mcp_config.yaml # Example configuration
+├── mcps/                       # 🧮 Demo MCP servers
+│   └── demo_calculator.py      # Calculator example
+├── notion_cli.py               # 🎨 Rich interactive Notion CLI
+├── main.py                     # 🚀 Application entry point
+├── pyproject.toml              # Python project configuration
+├── README.md                   # This file
+├── LICENSE                     # MIT License
+└── VERSION                     # Version information
 ```
 
 ## Release Notes
 
-### v1.0.0 - First Production Release (2025-01-08)
+### v1.0.0 - Production Release (2025-01-08)
 
-**Major Milestone**: First stable release ready for production deployment and LLMGine integration.
+**🚀 Major Milestone**: Production-ready release with comprehensive Notion integration and enterprise features.
 
-** New Features:**
-- Universal MCP adapter with auto-discovery and tool orchestration
-- Multi-LLM support for Claude and Gemini with unified interface
-- Natural language processing for any MCP without API knowledge
-- RESTful Web API with comprehensive endpoints for remote management
-- Works seamlessly with the official Notion MCP (via NPX) for workspace operations
-- Production-ready configuration management and health monitoring
-- LLMGine-compatible deployment with secure environment handling
+**✨ Key Features:**
+- **Complete Notion Integration**: 30+ tools covering full Notion API (Pages, Databases, Blocks, Users, Comments, Files, Search)
+- **Universal MCP Adapter**: Auto-discovery and orchestration of any MCP server
+- **Rich Interactive CLI**: Beautiful command-line interface with real-time feedback and colorful output
+- **Multi-LLM Support**: Claude and Gemini integration for advanced natural language processing
+- **Multi-Source Installation**: Docker, local scripts, Python modules, and Git repository support
+- **Production Web API**: RESTful interface with comprehensive endpoints and health monitoring
 
-** Technical Improvements:**
-- Standard MCP protocol compliance for seamless integration
-- Health check endpoints for monitoring and diagnostics
-- Secure environment variable configuration (no hardcoded secrets)
-- Docker and local deployment support with launcher scripts
-- Comprehensive error handling and logging throughout the stack
-- Multi-source MCP installation (Docker, local files, Python modules)
+**🔧 Technical Improvements:**
+- **8-Command CLI**: `list`, `install`, `start`, `stop`, `tools`, `call`, `chat`, `nl`
+- **Enhanced Error Handling**: Comprehensive error management and retry logic
+- **Health Monitoring**: Real-time status checks and diagnostics for all MCP servers
+- **Secure Configuration**: Environment variable-based secrets management
+- **Docker Support**: Production-ready containerization and deployment
+- **Natural Language Processing**: AI-powered tool discovery and execution
 
-** Documentation:**
-- Complete setup and deployment guides
-- LLMGine integration instructions with configuration examples
-- API documentation with cURL examples and JavaScript integration
-- Security best practices and environment variable management
+**📚 Documentation & Examples:**
+- **Complete Notion Example**: Production-ready implementation with 30+ tools
+- **Developer Templates**: Comprehensive patterns for building custom MCP servers
+- **API Documentation**: Full REST API reference with examples
+- **Security Guidelines**: Best practices for secret management and deployment
 
-**🔒 Security:**
-- All sensitive data moved to environment variables
-- Git history cleaned of any hardcoded secrets
-- Production-ready secret management practices
+**🔒 Security & Production:**
+- Environment variable-based configuration (no hardcoded secrets)
+- Comprehensive logging and monitoring
+- Production-ready deployment patterns
+- Git history sanitization
 
-This release establishes any-mcp as a stable, production-ready platform for MCP integration with modern LLM systems.
+This release establishes any-mcp as the definitive platform for MCP integration in enterprise environments.
 
 ## License
 

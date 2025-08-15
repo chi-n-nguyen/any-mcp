@@ -56,25 +56,40 @@ gemini_api_key = config.GEMINI_API_KEY
       class instance (Claude or Gemini).                                              
     - Returns the initialized LLM service object.                                     
                                                                                       
- 6. Define the main() async function:                                                 
+ 6. Define setup_mcp_clients(stack, mcp_manager):                                    
+    - Sets up the MCP manager context within the async stack.                        
+    - Collects all configured MCP clients from the manager.                          
+    - Processes additional server scripts from CLI arguments.                         
+    - Returns a dictionary of all available clients.                                 
+                                                                                      
+ 7. Define create_and_initialize_cli(clients, llm_service):                          
+    - Creates CliChat instance with doc_client, all clients, and LLM service.        
+    - Creates and initializes CliApp instance for the CLI interface.                 
+    - Returns the initialized CLI application.                                       
+                                                                                      
+ 8. Define display_mcp_status(mcp_manager, clients_count):                           
+    - Prints the number of loaded MCP clients.                                       
+    - Attempts to display detailed status of each MCP if manager supports it.        
+    - Handles exceptions gracefully with error messages.                             
+                                                                                      
+ 9. Define the main() async function:                                                 
     - Initializes the LLM service using initialize_llm_service_based_on_llm_provider. 
     - Creates an MCPManager instance to manage all MCP clients.                       
     - Uses AsyncExitStack to manage async context for all clients.                    
-    - Loads all active MCP clients from the manager.                                  
-    - Optionally, loads additional MCP clients from CLI arguments (server scripts).   
+    - Calls setup_mcp_clients() to load and configure all MCP clients.               
     - Ensures at least one client is loaded, else raises RuntimeError.                
-    - Creates a CliChat instance with the doc_client, all clients, and LLM service.   
-    - Creates a CliApp instance for the CLI interface, initializes it.                
-    - Prints status of loaded MCPs (if supported by manager).                         
+    - Calls create_and_initialize_cli() to set up the CLI interface.                 
+    - Calls display_mcp_status() to show status information.                         
     - Runs the CLI event loop (await cli.run()).                                      
                                                                                       
- 7. Note: The entry point (calling main()) is handled by the root main.py file,       
-    not here.                                                                         
+ 10. Note: The entry point (calling main()) is handled by the root main.py file,      
+     not here.                                                                        
                                                                                       
  In summary:                                                                          
     - This script loads config, validates it, initializes the LLM service,            
       loads MCP clients (from config and CLI), sets up the CLI chat interface,        
-      and runs the main CLI event loop.                                               
+      and runs the main CLI event loop. The main() function now delegates             
+      specific responsibilities to focused helper functions for better maintainability.
 '''
 
 def check_llm_provider_config():
@@ -116,6 +131,81 @@ def initialize_llm_service_based_on_llm_provider(llm_provider):
     else:
         raise ValueError(f"Unsupported LLM provider: {llm_provider}")
 
+async def setup_mcp_clients(stack, mcp_manager):
+    '''
+        Sets up and collects all MCP clients from both the manager configuration
+        and additional server scripts passed via CLI arguments.
+        
+        Returns:
+            dict: Dictionary of client_name -> MCPClient instances
+    '''
+    # Setup MCP Manager with configured MCPs
+    await stack.enter_async_context(mcp_manager)
+    
+    # Get clients from MCP manager + any additional command line MCPs
+    clients = {}
+    
+    # Add MCPs from manager
+    for mcp_name, client in mcp_manager.active_clients.items():
+        clients[mcp_name] = client
+    
+    # Optionally start additional server scripts passed via CLI
+    server_scripts = sys.argv[1:]
+
+    # Add any additional server scripts from command line
+    for i, server_script in enumerate(server_scripts):
+        client_id = f"client_{i}_{server_script}"
+        client = await stack.enter_async_context(
+            MCPClient(command="uv", args=["run", server_script])
+        )
+        clients[client_id] = client
+    
+    return clients
+
+async def create_and_initialize_cli(clients, llm_service):
+    '''
+        Creates and initializes the CLI application with the provided clients and LLM service.
+        
+        Args:
+            clients (dict): Dictionary of MCP clients
+            llm_service: Initialized LLM service instance
+            
+        Returns:
+            CliApp: Initialized CLI application ready to run
+    '''
+    # Create chat with all clients
+    doc_client = next(iter(clients.values()))
+    chat = CliChat(
+        doc_client=doc_client,
+        clients=clients,
+        llm_service=llm_service,
+    )
+
+    cli = CliApp(chat)
+    await cli.initialize()
+    
+    return cli
+
+async def display_mcp_status(mcp_manager, clients_count):
+    '''
+        Displays the status information for loaded MCP clients.
+        
+        Args:
+            mcp_manager: The MCP manager instance
+            clients_count (int): Number of loaded clients
+    '''
+    print(f"\n🚀 any-mcp CLI Ready with {clients_count} MCP client(s)!")
+    
+    if hasattr(mcp_manager, 'get_mcp_status'):
+        try:
+            status = await mcp_manager.get_mcp_status()
+            print("📋 MCP Status:")
+            for name, info in status.items():
+                emoji = "✅" if info.get("active") and info.get("healthy") else "❌"
+                print(f"   {emoji} {name}: {info.get('description', 'No description')}")
+        except Exception as e:
+            print(f"   ⚠️  Could not get MCP status: {e}")
+
 async def main():
     # Initialize LLM service based on provider
     llm_service = initialize_llm_service_based_on_llm_provider(llm_provider)
@@ -124,26 +214,8 @@ async def main():
     mcp_manager = MCPManager()
     
     async with AsyncExitStack() as stack:
-        # Setup MCP Manager with configured MCPs
-        await stack.enter_async_context(mcp_manager)
-        
-        # Get clients from MCP manager + any additional command line MCPs
-        clients = {}
-        
-        # Add MCPs from manager
-        for mcp_name, client in mcp_manager.active_clients.items():
-            clients[mcp_name] = client
-        
-        # Optionally start additional server scripts passed via CLI
-        server_scripts = sys.argv[1:]
-
-        # Add any additional server scripts from command line
-        for i, server_script in enumerate(server_scripts):
-            client_id = f"client_{i}_{server_script}"
-            client = await stack.enter_async_context(
-                MCPClient(command="uv", args=["run", server_script])
-            )
-            clients[client_id] = client
+        # Setup all MCP clients (from config and CLI arguments)
+        clients = await setup_mcp_clients(stack, mcp_manager)
 
         # Ensure at least one client is available
         if not clients:
@@ -151,29 +223,13 @@ async def main():
                 "No MCP clients loaded. Configure MCPs in config/mcp_config.yaml or pass server scripts."
             )
 
-        # Create chat with all clients
-        doc_client = next(iter(clients.values()))
-        chat = CliChat(
-            doc_client=doc_client,
-            clients=clients,
-            llm_service=llm_service,
-        )
-
-        cli = CliApp(chat)
-        await cli.initialize()
+        # Create and initialize CLI application
+        cli = await create_and_initialize_cli(clients, llm_service)
         
-        # Show status of loaded MCPs
-        print(f"\n🚀 any-mcp CLI Ready with {len(clients)} MCP client(s)!")
-        if hasattr(mcp_manager, 'get_mcp_status'):
-            try:
-                status = await mcp_manager.get_mcp_status()
-                print("📋 MCP Status:")
-                for name, info in status.items():
-                    emoji = "✅" if info.get("active") and info.get("healthy") else "❌"
-                    print(f"   {emoji} {name}: {info.get('description', 'No description')}")
-            except Exception as e:
-                print(f"   ⚠️  Could not get MCP status: {e}")
+        # Display status information for loaded MCPs
+        await display_mcp_status(mcp_manager, len(clients))
         
+        # Run the CLI event loop
         await cli.run()
 
 

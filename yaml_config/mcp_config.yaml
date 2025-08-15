@@ -1,40 +1,22 @@
-installed_mcps:
-  github:
+# MCP Configuration for any-mcp
+# This file defines which MCP servers any-mcp can manage and connect to
+
+mcp_servers:
+  # Official Notion MCP Server (3k+ stars, production ready)
+  notion-official:
+    name: "Official Notion MCP Server"
+    description: "Official Notion MCP server with full API access (3k+ stars on GitHub)"
     type: "docker"
-    source: "ghcr.io/github/github-mcp-server"
-    description: "GitHub's official MCP server for repository operations"
+    source: "mcp/notion"
     env_vars:
-      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
-      GITHUB_TOOLSETS: "all"
-    enabled: true
-
-  notion:
-    type: "local"
-    source: "./examples/notion_mcp_server.py"
-    description: "Notion MCP server for searching and managing Notion content"
-    env_vars:
-      NOTION_API_TOKEN: "${NOTION_API_TOKEN}"
-    enabled: true
-
+      NOTION_TOKEN: "${NOTION_API_TOKEN}"
+    status: "stopped"
+    
+  # Calculator MCP Server (for testing)
   calculator:
+    name: "Calculator MCP Server"
+    description: "Simple calculator MCP server for testing and demos"
     type: "local"
-    source: "./demos/mcp_calc_server.py"
-    description: "Simple calculator MCP for mathematical operations"
+    source: "./mcps/demo_calculator.py"
     env_vars: {}
-    enabled: true
-
-  documents:
-    type: "local"
-    source: "./mcp_server.py"
-    description: "Document management MCP for reading and editing documents"
-    env_vars: {}
-    enabled: true
-
-  # Example of a disabled MCP
-  # experimental:
-  #   type: "local"
-  #   source: "./mcps/experimental_mcp.py"
-  #   description: "Experimental MCP - disabled by default"
-  #   env_vars:
-  #     DEBUG_MODE: "true"
-  #   enabled: false 
+    status: "stopped" 

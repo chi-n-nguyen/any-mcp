@@ -11,17 +11,6 @@ installed_mcps:
       NOTION_TOKEN: "${NOTION_API_TOKEN}"
     enabled: true
     
-  # Discord MCP Server (45+ tools for comprehensive server management)
-  discord-mcp:
-    type: "local"
-    source: "/opt/homebrew/bin/mcp-discord"
-    description: "Modular Discord MCP server with 45+ tools for comprehensive server management"
-    env_vars:
-      DISCORD_TOKEN: "${DISCORD_BOT_TOKEN}"
-      DISCORD_CLIENT_ID: "${DISCORD_CLIENT_ID}"
-      DISCORD_GUILD_ID: "${DISCORD_GUILD_ID}"
-    enabled: true
-    
   # Calculator MCP Server (for testing)
   calculator:
     type: "local"

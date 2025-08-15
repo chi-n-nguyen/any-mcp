@@ -9,7 +9,7 @@ A production-ready, universal Model Context Protocol (MCP) client that seamlessl
 ## Key Features
 
 - **Universal MCP Client**: Connect to any MCP server (Docker, local, registry)
-- **🔌 Third-Party Extensible**: Build custom MCP clients and servers
+- **Third-Party Extensible**: Build custom MCP clients and servers
 - **Rich Interactive CLI**: Beautiful, intuitive command-line interface
 - **Web API**: RESTful API for programmatic access
 - **Multi-LLM Support**: Claude, Gemini, and custom LLM integrations
@@ -36,7 +36,7 @@ A production-ready, universal Model Context Protocol (MCP) client that seamlessl
 - **Docker Image**: `docker://image:tag`
 - **Registry**: `registry://name` (coming soon)
 
-## 🏗️ Architecture
+## Architecture
 
 Any-MCP is built with extensibility at its core, designed to support third-party integrations at every level:
 
@@ -44,24 +44,24 @@ Any-MCP is built with extensibility at its core, designed to support third-party
 
 ```mermaid
 graph TB
-    User[👤 User] --> CLI[🖥️ CLI Interface]
-    User --> WebAPI[🌐 Web API]
+    User[User] --> CLI[CLI Interface]
+    User --> WebAPI[Web API]
     
-    CLI --> MCPManager[🎛️ MCP Manager]
+    CLI --> MCPManager[MCP Manager]
     WebAPI --> MCPManager
     
-    MCPManager --> MCPClient[🖇️ MCP Client]
-    MCPClient --> LLM[🤖 LLM Services<br/>Claude/Gemini]
+    MCPManager --> MCPClient[MCP Client]
+    MCPClient --> LLM[LLM Services<br/>Claude/Gemini]
     
-    subgraph "🔌 Extensible MCP Servers"
-        Official[📔 Official Servers<br/>Notion, GitHub]
-        ThirdParty[🌍 Third-Party Servers<br/>Slack, Custom, etc.]
-        YourOwn[🔧 Your Custom Server<br/>Build Your Own]
+    subgraph "Extensible MCP Servers"
+        Official[Official Servers<br/>Notion, GitHub]
+        ThirdParty[Third-Party Servers<br/>Slack, Custom, etc.]
+        YourOwn[Your Custom Server<br/>Build Your Own]
     end
     
-    subgraph "🔧 Third-Party Integration"
-        CustomClient[🏗️ Custom Client<br/>Your Implementation]
-        SDK[📚 SDK & Wrappers<br/>Language Bindings]
+    subgraph "Third-Party Integration"
+        CustomClient[Custom Client<br/>Your Implementation]
+        SDK[SDK & Wrappers<br/>Language Bindings]
     end
     
     MCPClient --> Official
@@ -89,7 +89,7 @@ graph TB
     class CustomClient,SDK thirdparty
 ```
 
-### 🔌 Third-Party Integration Points
+### Third-Party Integration Points
 
 #### **Custom MCP Clients**
 - Build your own MCP client implementations
@@ -109,7 +109,7 @@ graph TB
 - Third-party LLM model integrations
 - Custom UI implementations
 
-### 🎯 Core Architecture Layers
+### Core Architecture Layers
 
 1. **User Interface Layer**: CLI, Web API, Custom UIs
 2. **Application Layer**: Chat systems, tool orchestration  
@@ -118,7 +118,7 @@ graph TB
 5. **MCP Core**: Extensible client framework with protocol adapters
 6. **Server Ecosystem**: Official and third-party MCP servers
 
-### 🌍 Extensibility Examples
+### Extensibility Examples
 
 **Enterprise Integration:**
 ```python

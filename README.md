@@ -74,10 +74,14 @@ graph TB
     
     SDK --> MCPClient
     
-    classDef user fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef servers fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
-    classDef thirdparty fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    %% Make text more readable
+    classDef textStyle font-size:14px,font-weight:bold
+    class User,CLI,WebAPI,MCPManager,MCPClient,LLM,Official,ThirdParty,YourOwn,CustomClient,SDK textStyle
+    
+    classDef user fill:#e3f2fd,stroke:#0277bd,stroke-width:3px
+    classDef core fill:#f1f8e9,stroke:#388e3c,stroke-width:3px
+    classDef servers fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef thirdparty fill:#fff8e1,stroke:#f57c00,stroke-width:3px
     
     class User user
     class CLI,WebAPI,MCPManager,MCPClient,LLM core

@@ -4,14 +4,17 @@ import os
 from dotenv import load_dotenv
 from contextlib import AsyncExitStack
 
+# for mcp functionality
 from any_mcp.core.client import MCPClient
 from any_mcp.managers.manager import MCPManager
 from any_mcp.core.claude import Claude
 from any_mcp.core.gemini import Gemini
 
+# for better CLI visualization
 from any_mcp.core.cli_chat import CliChat
 from any_mcp.core.cli import CliApp
 
+# for loading constants + API key
 import config
 
 # LLM Config - Support both Claude and Gemini, load the constant for Claude + Gemini Provider

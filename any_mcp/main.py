@@ -31,12 +31,23 @@ gemini_model = config.GEMINI_MODEL
 gemini_api_key = config.GEMINI_API_KEY
 
 def check_llm_provider_config():
-    # Check llm_provider + raise error if .env file is not well-defined
-    if llm_provider == claude_provider:
-        assert claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"
-        assert anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"
-    elif llm_provider == gemini_provider:
-        assert gemini_api_key, "Error: GEMINI_API_KEY cannot be empty when using Gemini. Update .env"
+    '''
+        Use a hashmap to dynamically check the provider config, 
+        so adding new providers is easy and not hardcoded with if-else.
+    '''
+    # Each provider maps to a list of (value, error_message) tuples to check
+    provider_checks = {
+        claude_provider: [
+            (claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"),
+            (anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"),
+        ],
+        gemini_provider: [
+            (gemini_api_key, "Error: GEMINI_API_KEY cannot be empty when using Gemini. Update .env"),
+        ],
+    }
+    if llm_provider in provider_checks:
+        for value, error_msg in provider_checks[llm_provider]:
+            assert value, error_msg
     else:
         raise ValueError(f"Unsupported LLM_PROVIDER: {llm_provider}. Use '{claude_provider}' or '{gemini_provider}'")
 

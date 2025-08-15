@@ -14,8 +14,10 @@ from any_mcp.core.cli import CliApp
 
 import config
 
-# LLM Config - Support both Claude and Gemini
+# LLM Config - Support both Claude and Gemini, load the constant for Claude + Gemini Provider
 llm_provider = config.LLM_PROVIDER
+claude_provider = config.CLAUDE_LLM_PROVIDER
+gemini_provider = config.GEMINI_LLM_PROVIDER
 
 # Claude Config
 claude_model = config.CLAUDE_MODEL
@@ -25,24 +27,37 @@ anthropic_api_key = config.ANTHROPIC_API_KEY
 gemini_model = config.GEMINI_MODEL
 gemini_api_key = config.GEMINI_API_KEY
 
-# Check llm_provider + raise error if .env file is not well-defined
-if llm_provider == "claude":
-    assert claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"
-    assert anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"
-elif llm_provider == "gemini":
-    assert gemini_api_key, "Error: GEMINI_API_KEY cannot be empty when using Gemini. Update .env"
-else:
-    raise ValueError(f"Unsupported LLM_PROVIDER: {llm_provider}. Use 'claude' or 'gemini'")
+def check_llm_provider_config():
+    # Check llm_provider + raise error if .env file is not well-defined
+    if llm_provider == claude_provider:
+        assert claude_model, "Error: CLAUDE_MODEL cannot be empty when using Claude. Update .env"
+        assert anthropic_api_key, "Error: ANTHROPIC_API_KEY cannot be empty when using Claude. Update .env"
+    elif llm_provider == gemini_provider:
+        assert gemini_api_key, "Error: GEMINI_API_KEY cannot be empty when using Gemini. Update .env"
+    else:
+        raise ValueError(f"Unsupported LLM_PROVIDER: {llm_provider}. Use '{claude_provider}' or '{gemini_provider}'")
 
+# Call the function to check config
+check_llm_provider_config()
+
+def initialize_llm_service_based_on_llm_provider(llm_provider):
+    '''
+        Helper function to initialize llm service based on llm provider, 
+            + add a hashmap so when we want to add more provider + service --> just need 
+              to add to hashmap, no need for hard-coding one more if else statment 
+    '''
+    llm_service_map = {
+        claude_provider : Claude(model=claude_model),
+        gemini_provider : Gemini(model=gemini_model, api_key=gemini_api_key),
+    }
+    if llm_provider in llm_service_map:
+        return llm_service_map[llm_provider]
+    else:
+        raise ValueError(f"Unsupported LLM provider: {llm_provider}")
 
 async def main():
     # Initialize LLM service based on provider
-    if llm_provider == "claude":
-        llm_service = Claude(model=claude_model)
-    elif llm_provider == "gemini":
-        llm_service = Gemini(model=gemini_model, api_key=gemini_api_key)
-    else:
-        raise ValueError(f"Unsupported LLM provider: {llm_provider}")
+    llm_service = initialize_llm_service_based_on_llm_provider(llm_provider)
 
     # Initialize MCP Manager to handle all configured MCPs
     mcp_manager = MCPManager()

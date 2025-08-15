@@ -9,8 +9,10 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Load LLm providers 
-LLM_PROVIDER = "gemini"
+# Load LLm providers + define constants for different types of LLM here
+LLM_PROVIDER = "gemini" # this line would be changed if we need to set llm provider to be another
+CLAUDE_LLM_PROVIDER = "claude"
+GEMINI_LLM_PROVIDER = "gemini"
 
 # define model + load API key for Claude 
 CLAUDE_MODEL= ""

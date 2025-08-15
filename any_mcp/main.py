@@ -30,6 +30,53 @@ anthropic_api_key = config.ANTHROPIC_API_KEY
 gemini_model = config.GEMINI_MODEL
 gemini_api_key = config.GEMINI_API_KEY
 
+'''                                                                                      
+ Workflow / Execution Order of this Script:                                           
+                                                                                      
+ 1. Import all necessary modules and classes, including:                              
+    - Standard libraries (asyncio, sys, os, dotenv, contextlib)                       
+    - Core MCP classes (MCPClient, MCPManager, Claude, Gemini)                        
+    - CLI utilities (CliChat, CliApp)                                                 
+    - Configuration loader (config.py)                                               
+                                                                                      
+ 2. Load configuration constants from config.py:                                       
+    - LLM provider selection (llm_provider, claude_provider, gemini_provider)         
+    - Model names and API keys for Claude and Gemini                                  
+                                                                                      
+ 3. Define check_llm_provider_config():                                               
+    - This function checks that the required config values (model, API key)           
+      are present for the selected LLM provider.                                      
+    - Uses a hashmap (provider_checks) to map provider to required values.            
+    - Raises assertion error or ValueError if config is missing or provider is wrong.
+                                                                                      
+ 4. Immediately call check_llm_provider_config() to validate config at startup.        
+                                                                                      
+ 5. Define initialize_llm_service_based_on_llm_provider(llm_provider):                
+    - Uses a hashmap (llm_service_map) to map provider to the correct LLM service     
+      class instance (Claude or Gemini).                                              
+    - Returns the initialized LLM service object.                                     
+                                                                                      
+ 6. Define the main() async function:                                                 
+    - Initializes the LLM service using initialize_llm_service_based_on_llm_provider. 
+    - Creates an MCPManager instance to manage all MCP clients.                       
+    - Uses AsyncExitStack to manage async context for all clients.                    
+    - Loads all active MCP clients from the manager.                                  
+    - Optionally, loads additional MCP clients from CLI arguments (server scripts).   
+    - Ensures at least one client is loaded, else raises RuntimeError.                
+    - Creates a CliChat instance with the doc_client, all clients, and LLM service.   
+    - Creates a CliApp instance for the CLI interface, initializes it.                
+    - Prints status of loaded MCPs (if supported by manager).                         
+    - Runs the CLI event loop (await cli.run()).                                      
+                                                                                      
+ 7. Note: The entry point (calling main()) is handled by the root main.py file,       
+    not here.                                                                         
+                                                                                      
+ In summary:                                                                          
+    - This script loads config, validates it, initializes the LLM service,            
+      loads MCP clients (from config and CLI), sets up the CLI chat interface,        
+      and runs the main CLI event loop.                                               
+'''
+
 def check_llm_provider_config():
     '''
         Use a hashmap to dynamically check the provider config, 

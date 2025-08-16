@@ -41,6 +41,21 @@ import os
 import sys
 from typing import Any, Dict, List, Optional
 import traceback
+import config
+import requests
+
+'''
+    Load all of the config constants for this file below here
+'''
+# For NOTION config
+notion_api_version = config.NOTION_API_VERSION
+notion_base_url = config.NOTION_BASE_URL
+notion_api_token = config.NOTION_API_TOKEN
+notion_api_key = config.NOTION_API_KEY
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # External dependencies for Notion integration
 try:
@@ -50,20 +65,9 @@ except ImportError:
     print("Missing dependencies. Install with: pip install requests python-dotenv")
     sys.exit(1)
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Notion API configuration
-NOTION_API_VERSION = "2022-06-28"
-NOTION_BASE_URL = "https://api.notion.com/v1"
-
 def get_notion_token():
     """Get Notion API token dynamically"""
-    return os.getenv("NOTION_API_TOKEN") or os.getenv("NOTION_API_KEY")
+    return notion_api_token or notion_api_key
 
 
 class NotionMCPServer:
@@ -526,7 +530,7 @@ class NotionMCPServer:
         return {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
-            "Notion-Version": NOTION_API_VERSION
+            "Notion-Version": notion_api_version
         }
     
     async def search_notion(self, query: str, filter_type: Optional[str] = None) -> Dict[str, Any]:
@@ -545,7 +549,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/search"
+            url = f"{notion_base_url}/search"
             payload = {
                 "query": query,
                 "page_size": 100  # Increased from 20 to 100 for more comprehensive results
@@ -605,7 +609,7 @@ class NotionMCPServer:
         
         try:
             # Get page metadata
-            page_url = f"{NOTION_BASE_URL}/pages/{page_id}"
+            page_url = f"{notion_base_url}/pages/{page_id}"
             page_response = requests.get(
                 page_url,
                 headers=self.get_notion_headers(),
@@ -621,7 +625,7 @@ class NotionMCPServer:
             page_data = page_response.json()
             
             # Get page blocks (content)
-            blocks_url = f"{NOTION_BASE_URL}/blocks/{page_id}/children"
+            blocks_url = f"{notion_base_url}/blocks/{page_id}/children"
             blocks_response = requests.get(
                 blocks_url,
                 headers=self.get_notion_headers(),
@@ -661,7 +665,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/databases/{database_id}/query"
+            url = f"{notion_base_url}/databases/{database_id}/query"
             payload = {"page_size": 50}
             
             # Add filter if specified
@@ -726,7 +730,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/pages"
+            url = f"{notion_base_url}/pages"
             payload = {
                 "parent": {"page_id": parent_id},
                 "properties": {
@@ -802,7 +806,7 @@ class NotionMCPServer:
         
         try:
             # Test API connectivity
-            url = f"{NOTION_BASE_URL}/users/me"
+            url = f"{notion_base_url}/users/me"
             response = requests.get(
                 url,
                 headers=self.get_notion_headers(),

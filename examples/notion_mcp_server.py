@@ -44,6 +44,10 @@ import traceback
 import config
 import requests
 
+# For loading tool path --> then load all tools for notion
+import tools_for_mcp_server.config_mcp_tools_path as mcp_tool_path
+from tools_for_mcp_server.tool_mcp_server_loading_package.load_tools import load_all_tools
+
 '''
     Load all of the config constants for this file below here
 '''
@@ -57,6 +61,9 @@ notion_api_key = config.NOTION_API_KEY
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Directory path for Notion tools here
+notion_tool_dir_path = mcp_tool_path.NOTION_TOOL_DIR_PATH
+
 # External dependencies for Notion integration
 try:
     import requests
@@ -68,26 +75,6 @@ except ImportError:
 """Get Notion API token dynamically"""
 def get_notion_token():
     return notion_api_token or notion_api_key
-
-
-''' 
-    Helper function to load available tools for __init__ function, 
-    by loading all the json file of the directory that have all of the json file
-    for all the tools, each tools will be in a separate json file 
-    --> easier for finding, updating, adding in the future
-'''
-def load_all_tools():
-    output_tool_list = []
-    ALL_TOOL_DIR_PATH = "examples/notion_mcp_server_tools"
-    
-    # dynamically load all the tools
-    for filename in os.listdir(ALL_TOOL_DIR_PATH):
-        if filename.endswith(".json"):
-            filepath = os.path.join(ALL_TOOL_DIR_PATH, filename)
-            with open(filepath, 'r') as f:
-                tool_data = json.load(f)
-                output_tool_list.append(tool_data)
-    return output_tool_list
 
 
 class NotionMCPServer:
@@ -103,7 +90,7 @@ class NotionMCPServer:
     
     def __init__(self):
         """Initialize the server and register available tools."""
-        self.tools = load_all_tools()
+        self.tools = load_all_tools(notion_tool_dir_path)
     
     def get_notion_headers(self) -> Dict[str, str]:
         """Get standard headers for Notion API requests."""

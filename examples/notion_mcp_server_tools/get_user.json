@@ -1,0 +1,16 @@
+{
+  "name": "get_user",
+  "description": "Get information about a specific user",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "user_id": {
+        "type": "string",
+        "description": "ID of the user to retrieve"
+      }
+    },
+    "required": [
+      "user_id"
+    ]
+  }
+}

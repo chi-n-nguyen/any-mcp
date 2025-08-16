@@ -1,0 +1,14 @@
+{
+  "name": "get_users",
+  "description": "Get list of all users in the workspace",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "page_size": {
+        "type": "integer",
+        "description": "Number of results per page (optional)"
+      }
+    },
+    "required": []
+  }
+}

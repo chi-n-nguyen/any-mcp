@@ -1,0 +1,9 @@
+{
+  "name": "get_me",
+  "description": "Get information about the current user",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

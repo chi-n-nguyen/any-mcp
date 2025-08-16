@@ -1,0 +1,28 @@
+{
+  "name": "search_with_filters",
+  "description": "Advanced search with multiple filters and options",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query string"
+      },
+      "filter": {
+        "type": "object",
+        "description": "Complex filter object (optional)"
+      },
+      "sort": {
+        "type": "object",
+        "description": "Sorting criteria (optional)"
+      },
+      "page_size": {
+        "type": "integer",
+        "description": "Number of results per page (optional)"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  }
+}

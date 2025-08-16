@@ -1,0 +1,16 @@
+{
+  "name": "delete_page",
+  "description": "Delete a Notion page",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "page_id": {
+        "type": "string",
+        "description": "ID of the page to delete"
+      }
+    },
+    "required": [
+      "page_id"
+    ]
+  }
+}

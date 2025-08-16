@@ -1,0 +1,25 @@
+{
+  "name": "create_page",
+  "description": "Create a new page in Notion",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "parent_id": {
+        "type": "string",
+        "description": "ID of parent page or database"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title of the new page"
+      },
+      "content": {
+        "type": "string",
+        "description": "Text content for the page (optional)"
+      }
+    },
+    "required": [
+      "parent_id",
+      "title"
+    ]
+  }
+}

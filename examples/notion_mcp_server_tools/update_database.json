@@ -1,0 +1,24 @@
+{
+  "name": "update_database",
+  "description": "Update an existing Notion database",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "database_id": {
+        "type": "string",
+        "description": "ID of the database to update"
+      },
+      "title": {
+        "type": "string",
+        "description": "New title (optional)"
+      },
+      "properties": {
+        "type": "object",
+        "description": "Properties to update (optional)"
+      }
+    },
+    "required": [
+      "database_id"
+    ]
+  }
+}

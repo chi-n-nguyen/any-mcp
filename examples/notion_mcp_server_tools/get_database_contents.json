@@ -1,0 +1,24 @@
+{
+  "name": "get_database_contents",
+  "description": "Get all entries from a Notion database",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "database_id": {
+        "type": "string",
+        "description": "The ID of the database to query"
+      },
+      "filter_property": {
+        "type": "string",
+        "description": "Property name to filter by (optional)"
+      },
+      "filter_value": {
+        "type": "string",
+        "description": "Value to filter for (optional)"
+      }
+    },
+    "required": [
+      "database_id"
+    ]
+  }
+}

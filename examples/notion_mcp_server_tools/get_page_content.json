@@ -1,0 +1,16 @@
+{
+  "name": "get_page_content",
+  "description": "Retrieve the content of a specific Notion page",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "page_id": {
+        "type": "string",
+        "description": "The ID of the page to retrieve"
+      }
+    },
+    "required": [
+      "page_id"
+    ]
+  }
+}

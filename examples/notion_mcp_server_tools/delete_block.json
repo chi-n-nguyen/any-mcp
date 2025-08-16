@@ -1,0 +1,16 @@
+{
+  "name": "delete_block",
+  "description": "Delete a content block",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "block_id": {
+        "type": "string",
+        "description": "ID of the block to delete"
+      }
+    },
+    "required": [
+      "block_id"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "query_database",
+  "description": "Advanced database query with filters and sorting",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "database_id": {
+        "type": "string",
+        "description": "ID of the database to query"
+      },
+      "filter": {
+        "type": "object",
+        "description": "Filter criteria (optional)"
+      },
+      "sorts": {
+        "type": "array",
+        "description": "Sorting criteria (optional)"
+      },
+      "page_size": {
+        "type": "integer",
+        "description": "Number of results per page (optional)"
+      }
+    },
+    "required": [
+      "database_id"
+    ]
+  }
+}

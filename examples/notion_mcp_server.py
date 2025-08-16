@@ -41,6 +41,21 @@ import os
 import sys
 from typing import Any, Dict, List, Optional
 import traceback
+import config
+import requests
+
+'''
+    Load all of the config constants for this file below here
+'''
+# For NOTION config
+notion_api_version = config.NOTION_API_VERSION
+notion_base_url = config.NOTION_BASE_URL
+notion_api_token = config.NOTION_API_TOKEN
+notion_api_key = config.NOTION_API_KEY
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # External dependencies for Notion integration
 try:
@@ -50,20 +65,29 @@ except ImportError:
     print("Missing dependencies. Install with: pip install requests python-dotenv")
     sys.exit(1)
 
-# Load environment variables
-load_dotenv()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Notion API configuration
-NOTION_API_VERSION = "2022-06-28"
-NOTION_BASE_URL = "https://api.notion.com/v1"
-
+"""Get Notion API token dynamically"""
 def get_notion_token():
-    """Get Notion API token dynamically"""
-    return os.getenv("NOTION_API_TOKEN") or os.getenv("NOTION_API_KEY")
+    return notion_api_token or notion_api_key
+
+
+''' 
+    Helper function to load available tools for __init__ function, 
+    by loading all the json file of the directory that have all of the json file
+    for all the tools, each tools will be in a separate json file 
+    --> easier for finding, updating, adding in the future
+'''
+def load_all_tools():
+    output_tool_list = []
+    ALL_TOOL_DIR_PATH = "examples/notion_mcp_server_tools"
+    
+    # dynamically load all the tools
+    for filename in os.listdir(ALL_TOOL_DIR_PATH):
+        if filename.endswith(".json"):
+            filepath = os.path.join(ALL_TOOL_DIR_PATH, filename)
+            with open(filepath, 'r') as f:
+                tool_data = json.load(f)
+                output_tool_list.append(tool_data)
+    return output_tool_list
 
 
 class NotionMCPServer:
@@ -79,444 +103,7 @@ class NotionMCPServer:
     
     def __init__(self):
         """Initialize the server and register available tools."""
-        self.tools = [
-            {
-                "name": "search_notion",
-                "description": "Search across all Notion content you have access to",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "Search query to find content"
-                        },
-                        "filter_type": {
-                            "type": "string",
-                            "enum": ["page", "database"],
-                            "description": "Filter results by type (optional)"
-                        }
-                    },
-                    "required": ["query"]
-                }
-            },
-            {
-                "name": "get_page_content",
-                "description": "Retrieve the content of a specific Notion page",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "The ID of the page to retrieve"
-                        }
-                    },
-                    "required": ["page_id"]
-                }
-            },
-            {
-                "name": "get_database_contents",
-                "description": "Get all entries from a Notion database",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "database_id": {
-                            "type": "string",
-                            "description": "The ID of the database to query"
-                        },
-                        "filter_property": {
-                            "type": "string",
-                            "description": "Property name to filter by (optional)"
-                        },
-                        "filter_value": {
-                            "type": "string", 
-                            "description": "Value to filter for (optional)"
-                        }
-                    },
-                    "required": ["database_id"]
-                }
-            },
-            {
-                "name": "create_page",
-                "description": "Create a new page in Notion",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "parent_id": {
-                            "type": "string",
-                            "description": "ID of parent page or database"
-                        },
-                        "title": {
-                            "type": "string",
-                            "description": "Title of the new page"
-                        },
-                        "content": {
-                            "type": "string",
-                            "description": "Text content for the page (optional)"
-                        }
-                    },
-                    "required": ["parent_id", "title"]
-                }
-            },
-            {
-                "name": "update_page",
-                "description": "Update an existing Notion page",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "ID of the page to update"
-                        },
-                        "title": {
-                            "type": "string",
-                            "description": "New title (optional)"
-                        },
-                        "properties": {
-                            "type": "object",
-                            "description": "Properties to update (optional)"
-                        }
-                    },
-                    "required": ["page_id"]
-                }
-            },
-            {
-                "name": "delete_page",
-                "description": "Delete a Notion page",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "ID of the page to delete"
-                        }
-                    },
-                    "required": ["page_id"]
-                }
-            },
-            {
-                "name": "move_page",
-                "description": "Move a page to a different parent",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "ID of the page to move"
-                        },
-                        "new_parent_id": {
-                            "type": "string",
-                            "description": "ID of the new parent page or database"
-                        }
-                    },
-                    "required": ["page_id", "new_parent_id"]
-                }
-            },
-            {
-                "name": "create_database",
-                "description": "Create a new Notion database",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "parent_id": {
-                            "type": "string",
-                            "description": "ID of parent page or database"
-                        },
-                        "title": {
-                            "type": "string",
-                            "description": "Title of the database"
-                        },
-                        "properties": {
-                            "type": "object",
-                            "description": "Database properties schema"
-                        }
-                    },
-                    "required": ["parent_id", "title"]
-                }
-            },
-            {
-                "name": "update_database",
-                "description": "Update an existing Notion database",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "database_id": {
-                            "type": "string",
-                            "description": "ID of the database to update"
-                        },
-                        "title": {
-                            "type": "string",
-                            "description": "New title (optional)"
-                        },
-                        "properties": {
-                            "type": "object",
-                            "description": "Properties to update (optional)"
-                        }
-                    },
-                    "required": ["database_id"]
-                }
-            },
-            {
-                "name": "delete_database",
-                "description": "Delete a Notion database",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "database_id": {
-                            "type": "string",
-                            "description": "ID of the database to delete"
-                        }
-                    },
-                    "required": ["database_id"]
-                }
-            },
-            {
-                "name": "query_database",
-                "description": "Advanced database query with filters and sorting",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "database_id": {
-                            "type": "string",
-                            "description": "ID of the database to query"
-                        },
-                        "filter": {
-                            "type": "object",
-                            "description": "Filter criteria (optional)"
-                        },
-                        "sorts": {
-                            "type": "array",
-                            "description": "Sorting criteria (optional)"
-                        },
-                        "page_size": {
-                            "type": "integer",
-                            "description": "Number of results per page (optional)"
-                        }
-                    },
-                    "required": ["database_id"]
-                }
-            },
-            {
-                "name": "create_block",
-                "description": "Create a new content block in a page",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "ID of the page to add block to"
-                        },
-                        "block_type": {
-                            "type": "string",
-                            "enum": ["paragraph", "heading_1", "heading_2", "heading_3", "bulleted_list_item", "numbered_list_item", "to_do", "toggle", "code", "quote", "callout", "divider", "image", "video", "file", "pdf", "bookmark", "equation", "table_of_contents", "breadcrumb", "link_preview", "template_button", "synced_block", "column_list", "column", "table", "table_row", "embed", "equation", "link_to_page", "audio", "unsupported"],
-                            "description": "Type of block to create"
-                        },
-                        "content": {
-                            "type": "string",
-                            "description": "Text content for the block"
-                        }
-                    },
-                    "required": ["page_id", "block_type", "content"]
-                }
-            },
-            {
-                "name": "update_block",
-                "description": "Update an existing content block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "block_id": {
-                            "type": "string",
-                            "description": "ID of the block to update"
-                        },
-                        "content": {
-                            "type": "string",
-                            "description": "New content for the block"
-                        }
-                    },
-                    "required": ["block_id", "content"]
-                }
-            },
-            {
-                "name": "delete_block",
-                "description": "Delete a content block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "block_id": {
-                            "type": "string",
-                            "description": "ID of the block to delete"
-                        }
-                    },
-                    "required": ["block_id"]
-                }
-            },
-            {
-                "name": "get_block_children",
-                "description": "Get all child blocks of a page or block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "block_id": {
-                            "type": "string",
-                            "description": "ID of the page or block"
-                        },
-                        "page_size": {
-                            "type": "integer",
-                            "description": "Number of results per page (optional)"
-                        }
-                    },
-                    "required": ["block_id"]
-                }
-            },
-            {
-                "name": "append_block_children",
-                "description": "Add multiple blocks to a page or block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "block_id": {
-                            "type": "string",
-                            "description": "ID of the page or block to add to"
-                        },
-                        "blocks": {
-                            "type": "array",
-                            "description": "Array of block objects to add"
-                        }
-                    },
-                    "required": ["block_id", "blocks"]
-                }
-            },
-            {
-                "name": "get_user",
-                "description": "Get information about a specific user",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "user_id": {
-                            "type": "string",
-                            "description": "ID of the user to retrieve"
-                        }
-                    },
-                    "required": ["user_id"]
-                }
-            },
-            {
-                "name": "get_users",
-                "description": "Get list of all users in the workspace",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_size": {
-                            "type": "integer",
-                            "description": "Number of results per page (optional)"
-                        }
-                    },
-                    "required": []
-                }
-            },
-            {
-                "name": "get_me",
-                "description": "Get information about the current user",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                }
-            },
-            {
-                "name": "create_comment",
-                "description": "Create a comment on a page or block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "parent_id": {
-                            "type": "string",
-                            "description": "ID of the page or block to comment on"
-                        },
-                        "content": {
-                            "type": "string",
-                            "description": "Comment text content"
-                        }
-                    },
-                    "required": ["parent_id", "content"]
-                }
-            },
-            {
-                "name": "get_comments",
-                "description": "Get all comments for a page or block",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "block_id": {
-                            "type": "string",
-                            "description": "ID of the page or block"
-                        },
-                        "page_size": {
-                            "type": "integer",
-                            "description": "Number of results per page (optional)"
-                        }
-                    },
-                    "required": ["block_id"]
-                }
-            },
-            {
-                "name": "upload_file",
-                "description": "Upload a file to Notion",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "page_id": {
-                            "type": "string",
-                            "description": "ID of the page to upload to"
-                        },
-                        "file_path": {
-                            "type": "string",
-                            "description": "Path to the file to upload"
-                        },
-                        "caption": {
-                            "type": "string",
-                            "description": "Caption for the file (optional)"
-                        }
-                    },
-                    "required": ["page_id", "file_path"]
-                }
-            },
-            {
-                "name": "search_with_filters",
-                "description": "Advanced search with multiple filters and options",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "Search query string"
-                        },
-                        "filter": {
-                            "type": "object",
-                            "description": "Complex filter object (optional)"
-                        },
-                        "sort": {
-                            "type": "object",
-                            "description": "Sorting criteria (optional)"
-                        },
-                        "page_size": {
-                            "type": "integer",
-                            "description": "Number of results per page (optional)"
-                        }
-                    },
-                    "required": ["query"]
-                }
-            },
-            {
-                "name": "health_check",
-                "description": "Check if the Notion MCP server is healthy and can connect to Notion API",
-                "inputSchema": {
-                    "type": "object",
-                    "properties": {},
-                    "required": []
-                }
-            }
-        ]
+        self.tools = load_all_tools()
     
     def get_notion_headers(self) -> Dict[str, str]:
         """Get standard headers for Notion API requests."""
@@ -526,7 +113,7 @@ class NotionMCPServer:
         return {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json",
-            "Notion-Version": NOTION_API_VERSION
+            "Notion-Version": notion_api_version
         }
     
     async def search_notion(self, query: str, filter_type: Optional[str] = None) -> Dict[str, Any]:
@@ -545,7 +132,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/search"
+            url = f"{notion_base_url}/search"
             payload = {
                 "query": query,
                 "page_size": 100  # Increased from 20 to 100 for more comprehensive results
@@ -605,7 +192,7 @@ class NotionMCPServer:
         
         try:
             # Get page metadata
-            page_url = f"{NOTION_BASE_URL}/pages/{page_id}"
+            page_url = f"{notion_base_url}/pages/{page_id}"
             page_response = requests.get(
                 page_url,
                 headers=self.get_notion_headers(),
@@ -621,7 +208,7 @@ class NotionMCPServer:
             page_data = page_response.json()
             
             # Get page blocks (content)
-            blocks_url = f"{NOTION_BASE_URL}/blocks/{page_id}/children"
+            blocks_url = f"{notion_base_url}/blocks/{page_id}/children"
             blocks_response = requests.get(
                 blocks_url,
                 headers=self.get_notion_headers(),
@@ -661,7 +248,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/databases/{database_id}/query"
+            url = f"{notion_base_url}/databases/{database_id}/query"
             payload = {"page_size": 50}
             
             # Add filter if specified
@@ -726,7 +313,7 @@ class NotionMCPServer:
             return {"error": "NOTION_API_TOKEN not configured"}
         
         try:
-            url = f"{NOTION_BASE_URL}/pages"
+            url = f"{notion_base_url}/pages"
             payload = {
                 "parent": {"page_id": parent_id},
                 "properties": {
@@ -802,7 +389,7 @@ class NotionMCPServer:
         
         try:
             # Test API connectivity
-            url = f"{NOTION_BASE_URL}/users/me"
+            url = f"{notion_base_url}/users/me"
             response = requests.get(
                 url,
                 headers=self.get_notion_headers(),

@@ -1,0 +1,25 @@
+{
+  "name": "upload_file",
+  "description": "Upload a file to Notion",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "page_id": {
+        "type": "string",
+        "description": "ID of the page to upload to"
+      },
+      "file_path": {
+        "type": "string",
+        "description": "Path to the file to upload"
+      },
+      "caption": {
+        "type": "string",
+        "description": "Caption for the file (optional)"
+      }
+    },
+    "required": [
+      "page_id",
+      "file_path"
+    ]
+  }
+}

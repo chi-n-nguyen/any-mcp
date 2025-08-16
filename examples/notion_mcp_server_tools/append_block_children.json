@@ -1,0 +1,21 @@
+{
+  "name": "append_block_children",
+  "description": "Add multiple blocks to a page or block",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "block_id": {
+        "type": "string",
+        "description": "ID of the page or block to add to"
+      },
+      "blocks": {
+        "type": "array",
+        "description": "Array of block objects to add"
+      }
+    },
+    "required": [
+      "block_id",
+      "blocks"
+    ]
+  }
+}

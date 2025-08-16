@@ -1,0 +1,21 @@
+{
+  "name": "create_comment",
+  "description": "Create a comment on a page or block",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "parent_id": {
+        "type": "string",
+        "description": "ID of the page or block to comment on"
+      },
+      "content": {
+        "type": "string",
+        "description": "Comment text content"
+      }
+    },
+    "required": [
+      "parent_id",
+      "content"
+    ]
+  }
+}

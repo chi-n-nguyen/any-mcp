@@ -1,0 +1,23 @@
+{
+  "name": "read_messages",
+  "description": "Read messages from a Discord channel",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "server": {
+        "type": "string",
+        "description": "Optional server name or ID"
+      },
+      "channel": {
+        "type": "string",
+        "description": "Channel name or ID"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Number of messages to fetch (default: 50)",
+        "default": 50
+      }
+    },
+    "required": ["channel"]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "get_guilds",
+  "description": "Get list of available Discord servers (guilds)",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

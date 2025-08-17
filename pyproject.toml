@@ -42,6 +42,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     # Async and concurrency
     "asyncio-mqtt>=0.13.0", # For future real-time features
+    "discord>=2.3.2",
+    "discord-py>=2.5.2",
 ]
 
 [project.optional-dependencies]

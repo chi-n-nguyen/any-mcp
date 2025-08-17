@@ -1,0 +1,9 @@
+{
+  "name": "health_check",
+  "description": "Check server health and Discord API connectivity",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

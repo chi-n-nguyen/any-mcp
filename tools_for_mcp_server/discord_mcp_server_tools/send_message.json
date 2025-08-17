@@ -1,0 +1,22 @@
+{
+  "name": "send_message",
+  "description": "Send a message to a Discord channel",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "server": {
+        "type": "string",
+        "description": "Optional server name or ID"
+      },
+      "channel": {
+        "type": "string",
+        "description": "Channel name or ID"
+      },
+      "message": {
+        "type": "string",
+        "description": "Message content to send"
+      }
+    },
+    "required": ["channel", "message"]
+  }
+}

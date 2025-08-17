@@ -1,0 +1,16 @@
+{
+  "name": "delete_database",
+  "description": "Delete a Notion database",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "database_id": {
+        "type": "string",
+        "description": "ID of the database to delete"
+      }
+    },
+    "required": [
+      "database_id"
+    ]
+  }
+}

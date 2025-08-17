@@ -1,22 +1,20 @@
 # MCP Configuration for any-mcp
 # This file defines which MCP servers any-mcp can manage and connect to
 
-mcp_servers:
+installed_mcps:
   # Official Notion MCP Server (3k+ stars, production ready)
   notion-official:
-    name: "Official Notion MCP Server"
+    type: "local"
+    source: "/opt/homebrew/bin/notion-mcp-server"
     description: "Official Notion MCP server with full API access (3k+ stars on GitHub)"
-    type: "docker"
-    source: "mcp/notion"
     env_vars:
       NOTION_TOKEN: "${NOTION_API_TOKEN}"
-    status: "stopped"
+    enabled: true
     
   # Calculator MCP Server (for testing)
   calculator:
-    name: "Calculator MCP Server"
-    description: "Simple calculator MCP server for testing and demos"
     type: "local"
     source: "./mcps/demo_calculator.py"
+    description: "Simple calculator MCP server for testing and demos"
     env_vars: {}
-    status: "stopped" 
+    enabled: true 

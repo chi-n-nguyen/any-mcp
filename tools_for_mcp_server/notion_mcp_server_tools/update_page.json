@@ -1,0 +1,24 @@
+{
+  "name": "update_page",
+  "description": "Update an existing Notion page",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "page_id": {
+        "type": "string",
+        "description": "ID of the page to update"
+      },
+      "title": {
+        "type": "string",
+        "description": "New title (optional)"
+      },
+      "properties": {
+        "type": "object",
+        "description": "Properties to update (optional)"
+      }
+    },
+    "required": [
+      "page_id"
+    ]
+  }
+}

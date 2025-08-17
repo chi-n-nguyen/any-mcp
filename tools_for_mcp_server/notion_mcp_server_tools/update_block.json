@@ -1,0 +1,21 @@
+{
+  "name": "update_block",
+  "description": "Update an existing content block",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "block_id": {
+        "type": "string",
+        "description": "ID of the block to update"
+      },
+      "content": {
+        "type": "string",
+        "description": "New content for the block"
+      }
+    },
+    "required": [
+      "block_id",
+      "content"
+    ]
+  }
+}

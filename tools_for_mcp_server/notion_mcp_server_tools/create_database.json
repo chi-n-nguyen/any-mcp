@@ -1,0 +1,25 @@
+{
+  "name": "create_database",
+  "description": "Create a new Notion database",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "parent_id": {
+        "type": "string",
+        "description": "ID of parent page or database"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title of the database"
+      },
+      "properties": {
+        "type": "object",
+        "description": "Database properties schema"
+      }
+    },
+    "required": [
+      "parent_id",
+      "title"
+    ]
+  }
+}

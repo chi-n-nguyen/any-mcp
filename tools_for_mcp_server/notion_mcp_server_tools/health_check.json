@@ -1,0 +1,9 @@
+{
+  "name": "health_check",
+  "description": "Check if the Notion MCP server is healthy and can connect to Notion API",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  }
+}

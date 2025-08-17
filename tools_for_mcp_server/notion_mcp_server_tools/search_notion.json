@@ -1,0 +1,24 @@
+{
+  "name": "search_notion",
+  "description": "Search across all Notion content you have access to",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search query to find content"
+      },
+      "filter_type": {
+        "type": "string",
+        "enum": [
+          "page",
+          "database"
+        ],
+        "description": "Filter results by type (optional)"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  }
+}

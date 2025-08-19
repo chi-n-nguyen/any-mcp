@@ -1,0 +1,165 @@
+# Example MCP Server Configuration
+# This file demonstrates how to configure MCP servers for llmgine integration
+
+mcp_servers:
+  # Basic calculator server
+  - name: calculator
+    command: python
+    args: ["mcps/demo_calculator.py"]
+    description: "Basic mathematical operations"
+    tags: ["math", "utility", "basic"]
+    auto_start: true
+    priority: 50
+    timeout_seconds: 30
+    max_retries: 3
+    supported_platforms: ["linux", "darwin", "win32"]
+    
+  # Notion integration server
+  - name: notion
+    command: python
+    args: ["all_mcp_servers/notion_mcp_server.py"]
+    env:
+      NOTION_TOKEN: "${NOTION_TOKEN}"
+    description: "Notion workspace integration for document management"
+    version: "2.0.0"
+    author: "LLMgine Team"
+    tags: ["productivity", "documents", "notion", "workspace"]
+    auto_start: true
+    priority: 10  # Higher priority (lower number)
+    timeout_seconds: 60
+    max_retries: 2
+    python_requirements:
+      - "notion-client>=2.0.0"
+      - "requests>=2.25.0"
+    supported_platforms: ["linux", "darwin", "win32"]
+    # Only include specific tools
+    include_tools: ["create_page", "search_pages", "update_page"]
+    
+  # Web search server
+  - name: web_search
+    command: python
+    args: ["servers/web_search_server.py"]
+    env:
+      SEARCH_API_KEY: "${SEARCH_API_KEY}"
+      SEARCH_ENGINE_ID: "${SEARCH_ENGINE_ID}"
+    description: "Web search and information retrieval"
+    tags: ["search", "web", "information"]
+    auto_start: false  # Manual start required
+    priority: 30
+    timeout_seconds: 45
+    max_retries: 3
+    python_requirements:
+      - "google-api-python-client>=2.0.0"
+      - "beautifulsoup4>=4.9.0"
+    # Exclude admin tools
+    exclude_tools: ["admin_search", "clear_cache"]
+    
+  # Weather information server
+  - name: weather
+    command: python
+    args: ["servers/weather_server.py"]
+    env:
+      WEATHER_API_KEY: "${WEATHER_API_KEY}"
+    description: "Current weather and forecast information"
+    tags: ["weather", "forecast", "location"]
+    auto_start: true
+    priority: 40
+    timeout_seconds: 20
+    max_retries: 2
+    python_requirements:
+      - "requests>=2.25.0"
+      - "python-dateutil>=2.8.0"
+    
+  # File operations server
+  - name: file_ops
+    command: python
+    args: ["servers/file_operations_server.py"]
+    description: "File system operations and management"
+    tags: ["files", "filesystem", "utility"]
+    auto_start: true
+    priority: 60
+    timeout_seconds: 30
+    max_retries: 1
+    # Platform-specific - only Unix-like systems
+    supported_platforms: ["linux", "darwin"]
+    
+  # Database operations server
+  - name: database
+    command: python
+    args: ["servers/database_server.py"]
+    env:
+      DATABASE_URL: "${DATABASE_URL}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+    description: "Database query and management operations"
+    tags: ["database", "sql", "data"]
+    auto_start: false  # Requires manual configuration
+    priority: 20
+    timeout_seconds: 90
+    max_retries: 1
+    python_requirements:
+      - "sqlalchemy>=1.4.0"
+      - "psycopg2-binary>=2.8.0"
+    system_requirements:
+      - "postgresql-client"
+    
+  # Custom AI assistant server
+  - name: ai_assistant
+    command: python
+    args: ["servers/ai_assistant_server.py"]
+    env:
+      OPENAI_API_KEY: "${OPENAI_API_KEY}"
+      MODEL_NAME: "gpt-4o-mini"
+    description: "AI-powered assistant with specialized capabilities"
+    version: "1.5.0"
+    author: "Custom AI Team"
+    tags: ["ai", "assistant", "custom", "specialized"]
+    auto_start: true
+    priority: 5  # Highest priority
+    timeout_seconds: 120
+    max_retries: 2
+    python_requirements:
+      - "openai>=1.0.0"
+      - "tiktoken>=0.5.0"
+    
+  # Development and testing server
+  - name: dev_tools
+    command: python
+    args: ["servers/development_server.py"]
+    description: "Development and testing utilities"
+    tags: ["development", "testing", "debug"]
+    auto_start: false  # Only for development
+    priority: 100  # Lowest priority
+    timeout_seconds: 15
+    max_retries: 1
+    supported_platforms: ["linux", "darwin"]  # Development environments only
+
+# Global configuration (optional)
+global_config:
+  # Default timeout for all servers
+  default_timeout_seconds: 30
+  
+  # Default retry settings
+  default_max_retries: 3
+  default_retry_delay: 1.0
+  
+  # Logging configuration
+  log_level: "INFO"
+  log_file: "logs/mcp_servers.log"
+  
+  # Health check settings
+  health_check_interval: 60  # seconds
+  health_check_timeout: 10   # seconds
+  
+  # Resource limits
+  max_concurrent_executions: 10
+  memory_limit_mb: 512
+  
+  # Security settings
+  allow_environment_override: true
+  restricted_commands: ["rm", "sudo", "chmod"]
+  
+  # Performance settings
+  enable_tool_caching: true
+  cache_ttl_seconds: 300
+  enable_connection_pooling: true
+

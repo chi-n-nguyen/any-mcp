@@ -1,34 +1,34 @@
-# 🚀 MCP Integration Framework
+# any-mcp
 
 A comprehensive framework for integrating MCP (Model Context Protocol) servers with Python applications.
 
-## 🎯 What This Gives You
+## What This Gives You
 
 **Instead of writing custom API code for every external service, you get professional tools automatically:**
 
-- ✅ **18+ Notion tools** - Create, read, update, delete pages, databases, blocks
-- ✅ **Calculator tools** - Math operations, scientific functions
-- ✅ **Discord integration** - Message handling, bot management
-- ✅ **Extensible framework** - Add any MCP server with one line
+- **18+ Notion tools** - Create, read, update, delete pages, databases, blocks
+- **Calculator tools** - Math operations, scientific functions
+- **Discord integration** - Message handling, bot management
+- **Extensible framework** - Add any MCP server with one line
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 mcp/
-├── demos/                    # 🎮 Working examples
+├── demos/                    # Working examples
 │   ├── notion/             # Notion MCP integration demos
 │   ├── tools/              # MCP tool combination examples
 │   └── integration/        # Advanced integration patterns
-├── src/                     # 🔧 Core MCP integration code
+├── src/                     # Core MCP integration code
 │   ├── any_mcp/            # MCP client and adapter implementations
 │   └── llmgine/            # LLMgine integration layer
-├── mcps/                    # 🖥️ MCP server examples
-├── config/                  # ⚙️ Configuration files
-├── docs/                    # 📚 Documentation
-└── tests/                   # 🧪 Test suite
+├── mcps/                    # MCP server examples
+├── config/                  # Configuration files
+├── docs/                    # Documentation
+└── tests/                   # Test suite
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone and Setup
 ```bash
@@ -50,7 +50,7 @@ cd demos/tools
 python hybrid_tool_demo.py
 ```
 
-## 🔐 Environment Setup
+## Environment Setup
 
 ```bash
 # Set your API tokens (never hardcode!)
@@ -61,7 +61,7 @@ export GEMINI_API_KEY="your_gemini_key_here"
 uv pip install -e ".[dev]"
 ```
 
-## 🎮 Available Demos
+## Available Demos
 
 ### **Notion Integration** (`demos/notion/`)
 - **`test_real_notion.py`** - Test with your actual Notion workspace
@@ -72,7 +72,7 @@ uv pip install -e ".[dev]"
 - **`hybrid_tool_demo.py`** - Combine MCP + local tools
 - **`simple_interactive_demo.py`** - Interactive testing
 
-## 🔧 Core Components
+## Core Components
 
 ### **MCP Client** (`src/any_mcp/`)
 - Connect to any MCP server
@@ -84,13 +84,13 @@ uv pip install -e ".[dev]"
 - Tool management and routing
 - Response handling
 
-## 📚 Documentation
+## Documentation
 
 - **[MCP Integration Guide](docs/llmgine-mcp-integration.md)** - Comprehensive guide
 - **[API Reference](docs/api.md)** - Tool and client documentation
 - **[Examples](demos/)** - Working code examples
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -101,15 +101,15 @@ pytest tests/integration/
 pytest tests/unit/
 ```
 
-## 🎉 Key Benefits
+## Key Benefits
 
-- **🚫 No Custom API Code** - Use existing MCP servers
-- **🔒 Secure** - Environment variables, no hardcoded secrets
-- **⚡ Fast** - Professional tools ready to use
-- **🔄 Extensible** - Add new services without coding
-- **🧪 Tested** - Comprehensive test suite
+- **No Custom API Code** - Use existing MCP servers
+- **Secure** - Environment variables, no hardcoded secrets
+- **Fast** - Professional tools ready to use
+- **Extensible** - Add new services without coding
+- **Tested** - Comprehensive test suite
 
-## 🤝 Contributing
+## Contributing
 
 1. **Fork** the repository
 2. **Create** a feature branch
@@ -117,10 +117,10 @@ pytest tests/unit/
 4. **Test** with the demo framework
 5. **Submit** a pull request
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Ready to eliminate custom API code? Start with `demos/notion/test_real_notion.py`!** 🚀
+**Ready to eliminate custom API code? Start with `demos/notion/test_real_notion.py`!**

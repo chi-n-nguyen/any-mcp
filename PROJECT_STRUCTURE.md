@@ -1,5 +1,7 @@
 # Project Structure
 
+![Project Structure Workflow Diagram](project_structure_workflow_diagram.png)
+
 This project now follows Python packaging best practices:
 
 ## Directory Structure
@@ -87,3 +89,7 @@ manager = MCPManager()
 ```
 
 This structure follows Python packaging standards and makes the project more maintainable and professional.
+
+## Special Thanks
+
+This project's structure and clarity have been significantly inspired by the excellent work of [Ahmed Khaleel](https://ahmedkhaleel.dev/) and his amazing project, [GitDiagram](https://gitdiagram.com/), which visualizes GitHub repositories. Their dedication to well-structured and understandable projects is truly commendable.

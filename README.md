@@ -1,55 +1,55 @@
-# any-mcp
+# LLMgine with Unified MCP Integration
 
-A comprehensive framework for integrating MCP (Model Context Protocol) servers with Python applications.
+LLMgine enhanced with a unified MCP (Model Context Protocol) system that provides seamless access to both local tools and third-party MCP servers.
 
 ## What This Gives You
 
-**Instead of writing custom API code for every external service, you get professional tools automatically:**
+**A unified tool management system that provides:**
 
-- **18+ Notion tools** - Create, read, update, delete pages, databases, blocks
-- **Calculator tools** - Math operations, scientific functions
-- **Extensible framework** - Add any MCP server with one line
+- **Unified Interface** - Single ToolManager for local and MCP tools
+- **18+ Notion tools** - Official Notion MCP server integration
+- **Local Tool Support** - Existing LLMgine tools as MCP server
+- **Popular MCP Servers** - GitHub, Filesystem, SQLite, Web Search, Memory, Kubernetes, Slack
+- **Configuration-Driven** - YAML-based MCP server management
 
 ## Project Structure
 
 ```
-mcp/
-├── demos/                    # Working examples
-│   ├── notion/             # Notion MCP integration demos  
-│   ├── tools/              # MCP tool combination examples
-│   ├── mcp_integration_demo.py # Comprehensive MCP demo
-│   └── mcp_unified_demo.py    # Unified demo script
-├── src/                     # Core MCP integration code
-│   ├── any_mcp/            # MCP client and adapter implementations
-│   └── llmgine/            # LLMgine integration layer
-├── mcps/                    # MCP server examples
-├── programs/                # Example applications
-│   └── engines/            # Enhanced engine implementations
-├── config/                  # Configuration files
+llmgine-mcp-integration/
+├── src/                     # Core implementation
+│   ├── any_mcp/            # Complete MCP client system
+│   └── llmgine/            # LLMgine with unified MCP ToolManager
+├── config/                  # MCP server configurations
+│   └── mcp_servers_config.yaml
+├── mcps/                    # MCP server implementations
+│   ├── llmgine_local_tools.py  # Local tools as MCP server
+│   └── demo_calculator.py      # Example MCP server
+├── examples/                # Integration examples
+│   └── mcp_unified_demo.py     # Complete usage demo
+├── programs/engines/        # Enhanced engines with MCP support
 ├── docs/                    # Documentation
-└── tests/                   # Comprehensive test suite
+└── tests/                   # Test suite
 ```
 
 ## Quick Start
 
 ### 1. Clone and Setup
 ```bash
-git clone <your-repo>
-cd mcp
-source .venv/bin/activate
+git clone https://github.com/chi-n-nguyen/llmgine-mcp-integration.git
+cd llmgine-mcp-integration
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
 ```
 
-### 2. Test Real Notion Integration
+### 2. Configure MCP Servers
 ```bash
-cd demos/notion
-export NOTION_TOKEN="your_token_here"
-python test_real_notion.py
+export NOTION_TOKEN="your_token_here"  # For Notion integration
+export GITHUB_TOKEN="your_token_here"  # For GitHub integration
 ```
 
-### 3. Run Tool Demos
+### 3. Run Unified Demo
 ```bash
-cd demos/tools
-python hybrid_tool_demo.py
+python examples/mcp_unified_demo.py
 ```
 
 ## Environment Setup
@@ -63,33 +63,48 @@ export GEMINI_API_KEY="your_gemini_key_here"
 uv pip install -e ".[dev]"
 ```
 
-## Available Demos
+## Key Features
 
-### **Notion Integration** (`demos/notion/`)
-- **`test_real_notion.py`** - Test with your actual Notion workspace
-- **`notion_mcp_demo.py`** - See 18+ tools automatically available
-- **`real_notion_mcp_demo.py`** - Full integration example
+### **100% Backward Compatible**
+- Drop-in replacement for existing ToolManager
+- No code changes required for existing applications
+- Same API, enhanced with MCP capabilities
 
-### **Comprehensive Demos** (`demos/`)
-
-- **`mcp_integration_demo.py`** - Complete MCP integration demonstration
-- **`mcp_unified_demo.py`** - Unified MCP and LLMgine demo
-
-### **Tool Examples** (`demos/tools/`)
-- **`hybrid_tool_demo.py`** - Combine MCP + local tools
-- **`simple_interactive_demo.py`** - Interactive testing
+### **Unified Tool Management**
+- Single interface for local and third-party tools
+- Configuration-driven MCP server management
+- Automatic tool discovery and registration
 
 ## Core Components
 
-### **MCP Client** (`src/any_mcp/`)
-- Connect to any MCP server
-- Handle authentication and communication
-- Tool discovery and execution
+### **Unified MCP ToolManager** (`src/llmgine/llm/tools/mcp_unified_tool_manager.py`)
+- Drop-in replacement for original ToolManager
+- Maintains exact same interface for 100% backward compatibility
+- Powered by any-mcp system
+- Supports both local and third-party MCP servers
 
-### **MCP Adapter** (`src/llmgine/llm/tools/`)
-- Integrate MCP tools with LLMgine
-- Tool management and routing
-- Response handling
+### **Configuration System** (`src/llmgine/llm/tools/mcp_config_loader.py`)
+- YAML-based configuration for all MCP servers
+- Environment variable support with `${VAR_NAME}` syntax
+- Automatic server discovery and startup
+
+### **Local Tools MCP Server** (`mcps/llmgine_local_tools.py`)
+- Existing LLMgine tools wrapped as MCP server
+- Seamless integration with unified system
+
+## Usage Example
+
+```python
+from llmgine.llm.tools import ToolManager
+
+# Initialize unified MCP-powered ToolManager
+manager = ToolManager()
+await manager.initialize()
+
+# Works exactly like before - 100% backward compatible
+tools = await manager.get_available_tools()
+result = await manager.execute_tool("get_weather", {"city": "New York"})
+```
 
 ## Documentation
 
@@ -136,4 +151,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Ready to eliminate custom API code? Start with `demos/notion/test_real_notion.py`!**
+**Unified MCP integration for LLMgine - one interface for all tools!**

@@ -89,6 +89,7 @@ uv pip install -e ".[dev]"
 - **[MCP Integration Guide](docs/llmgine-mcp-integration.md)** - Comprehensive guide
 - **[API Reference](docs/api.md)** - Tool and client documentation
 - **[Examples](demos/)** - Working code examples
+- **[CLAUDE.md](CLAUDE.md)** - AI assistant guide for contributors
 
 ## Testing
 
@@ -116,6 +117,11 @@ pytest tests/unit/
 3. **Add** your MCP server integration
 4. **Test** with the demo framework
 5. **Submit** a pull request
+
+### For Claude Code Contributors
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive guide for Claude Code contributors
+- **Development setup** - Environment configuration and testing
+- **Architecture overview** - Core components and integration patterns
 
 ## License
 

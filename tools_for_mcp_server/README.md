@@ -1,6 +1,6 @@
 # Tools for MCP Servers
 
-This directory serves as a centralized repository for tools used by various Multi-Cloud Platform (MCP) servers. Each subdirectory within `tools_for_mcp_server` is dedicated to a specific MCP server, containing its associated tools in JSON format.
+This directory serves as a centralized repository for tools used by various Model Context Protocol (MCP) servers. Each subdirectory within `tools_for_mcp_server` is dedicated to a specific MCP server, containing its associated tools in JSON format.
 
 ## Structure
 

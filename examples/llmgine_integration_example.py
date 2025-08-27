@@ -93,12 +93,6 @@ class IntegrationExample:
         # Add example MCP servers (adjust paths as needed)
         example_configs = [
             {
-                "name": "notion",
-                "command": "python",
-                "args": ["all_mcp_servers/notion_mcp_server.py"],
-                "env": {}
-            },
-            {
                 "name": "calculator",
                 "command": "python", 
                 "args": ["mcps/demo_calculator.py"],

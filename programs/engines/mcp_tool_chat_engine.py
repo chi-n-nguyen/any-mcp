@@ -29,14 +29,7 @@ from llmgine.ui.cli.cli import EngineCLI
 from llmgine.ui.cli.components import EngineResultComponent
 
 # Import our MCP components
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager, MCPServerConfig, create_default_mcp_servers
-from llmgine.llm.tools.mcp_bridge_integration import (
-    LLMgineMCPBridge,
-    create_llmgine_mcp_integration,
-    get_default_mcp_servers,
-    MCPToolExecutionLLMgineEvent,
-    MCPToolRegisteredLLMgineEvent
-)
+from llmgine.llm.tools import ToolManager, create_mcp_tool_manager
 
 
 @dataclass

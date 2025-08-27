@@ -21,8 +21,7 @@ import yaml
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager, MCPServerConfig
-from llmgine.llm.tools.mcp_registry import MCPServerRegistry, MCPServerDefinition
+from llmgine.llm.tools import ToolManager, create_mcp_tool_manager
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

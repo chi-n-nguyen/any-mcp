@@ -2,11 +2,11 @@
 
 ## Overview
 
-This document provides a comprehensive guide to the integration between **LLMgine** and the **Model Context Protocol (MCP)** system. The integration replaces LLMgine's original ToolManager with a powerful MCP-based system that provides enhanced tool management, dynamic discovery, and seamless integration with external tool providers.
+This document provides a comprehensive guide to the **revolutionary new architecture** that transforms LLMgine's ToolManager into an **MCP server** while using **any-mcp as an MCP client**. This approach creates a unified, scalable system where LLMgine's tools become available through the MCP protocol, and any-mcp can connect to both LLMgine's ToolManager and external MCP servers simultaneously.
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
+1. [New Architecture Overview](#new-architecture-overview)
 2. [Key Components](#key-components)
 3. [Getting Started](#getting-started)
 4. [Migration Guide](#migration-guide)
@@ -17,610 +17,833 @@ This document provides a comprehensive guide to the integration between **LLMgin
 9. [Performance Considerations](#performance-considerations)
 10. [API Reference](#api-reference)
 
-## Architecture Overview
+## New Architecture Overview
 
-The MCP integration provides a seamless bridge between LLMgine's existing architecture and the MCP ecosystem:
+The **revolutionary new architecture** flips the traditional approach on its head:
 
 ```
-┌─────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐
-│   LLMgine Engine    │    │   MCP Integration    │    │    MCP Servers      │
-│                     │    │                      │    │                     │
-│ ┌─────────────────┐ │    │ ┌──────────────────┐ │    │ ┌─────────────────┐ │
-│ │ ToolChatEngine  │◄┼────┼►│ MCPToolManager   │◄┼────┼►│ Calculator      │ │
-│ └─────────────────┘ │    │ └──────────────────┘ │    │ └─────────────────┘ │
-│                     │    │                      │    │                     │
-│ ┌─────────────────┐ │    │ ┌──────────────────┐ │    │ ┌─────────────────┐ │
-│ │ MessageBus      │◄┼────┼►│ LLMgineMCPBridge │◄┼────┼►│ Notion          │ │
-│ └─────────────────┘ │    │ └──────────────────┘ │    │ └─────────────────┘ │
-│                     │    │                      │    │                     │
-│ ┌─────────────────┐ │    │ ┌──────────────────┐ │    │ ┌─────────────────┐ │
-│ │ Event System    │◄┼────┼►│ Event Handlers   │◄┼────┼►│ Custom Tools    │ │
-│ └─────────────────┘ │    │ └──────────────────┘ │    │ └─────────────────┘ │
-└─────────────────────┘    └──────────────────────┘    └─────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              any-mcp (MCP Client)                          │
+│                                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │                    Unified MCP Client System                        │   │
+│  │                                                                     │   │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐    │   │
+│  │  │   MCP Manager   │  │  Tool Adapter   │  │  Event Bridge   │    │   │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────┘    │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ MCP Protocol
+                                    │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+            ┌───────▼──────┐ ┌───────▼──────┐ ┌───────▼──────┐
+            │              │ │              │ │              │
+            │ LLMgine      │ │ Notion       │ │ GitHub       │
+            │ ToolManager  │ │ MCP Server   │ │ MCP Server   │
+            │ (MCP Server) │ │              │ │              │
+            │              │ │              │ │              │
+            └──────────────┘ └──────────────┘ └──────────────┘
+                    │
+                    │ Exposes LLMgine tools as MCP tools
+                    │
+            ┌───────▼──────┐
+            │              │
+            │ get_weather  │
+            │ calculate    │
+            │ search_web   │
+            │ play_music   │
+            │ ...          │
+            └──────────────┘
 ```
 
-### Key Benefits
+### **Key Benefits of New Architecture**
 
-- **Drop-in Replacement**: MCPToolManager implements the same interface as the original ToolManager
-- **Enhanced Capabilities**: Dynamic tool discovery, server health monitoring, and advanced lifecycle management
-- **Event-Driven**: Full integration with LLMgine's MessageBus system
-- **Backwards Compatible**: Existing local tools continue to work seamlessly
-- **Extensible**: Easy to add new MCP servers and tool providers
+- **🔄 ToolManager as MCP Server**: LLMgine's existing tools are now available through the MCP protocol
+- **🔌 any-mcp as MCP Client**: Single client that can connect to multiple MCP servers simultaneously
+- **🌐 Universal Access**: Any MCP-compliant client can now use LLMgine's tools
+- **🚀 Scalability**: Easy to add new MCP servers without changing the client architecture
+- **🔄 Backward Compatibility**: Existing LLMgine code continues to work unchanged
+- **🔧 Unified Management**: Single interface for all tools (local + external MCP servers)
 
 ## Key Components
 
-### 1. MCPToolManager (`src/llmgine/llm/tools/mcp_tool_manager.py`)
+### 1. **LLMgine ToolManager MCP Server** (`mcps/llmgine_local_tools.py`)
 
-The core replacement for LLMgine's original ToolManager:
-
-```python
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager, MCPServerConfig
-
-# Create MCP tool manager
-tool_manager = MCPToolManager(chat_history, session_id)
-
-# Register local tools (backwards compatibility)
-tool_manager.register_tool(my_function)
-
-# Register MCP servers
-await tool_manager.register_mcp_server(MCPServerConfig(
-    name="calculator",
-    command="python",
-    args=["mcps/demo_calculator.py"],
-    env={},
-    auto_start=True
-))
-
-# Execute tools (same interface as original)
-result = await tool_manager.execute_tool_call(tool_call)
-```
-
-**Key Features:**
-- Same interface as original ToolManager
-- Mixed execution environment (local + MCP tools)
-- Automatic tool schema generation
-- Health monitoring and error recovery
-- Comprehensive logging and metrics
-
-### 2. LLMgineMCPBridge (`src/llmgine/llm/tools/mcp_bridge_integration.py`)
-
-Provides deep integration with LLMgine's MessageBus system:
+**LLMgine's ToolManager is now an MCP server** that exposes all existing tools through the MCP protocol:
 
 ```python
-from llmgine.llm.tools.mcp_bridge_integration import LLMgineMCPBridge
+#!/usr/bin/env python3
+"""
+LLMgine Local Tools MCP Server
 
-# Create bridge integration
-bridge = LLMgineMCPBridge(llmgine_bus, session_id)
-await bridge.initialize()
+This MCP server wraps LLMgine's existing local tools so they can be
+managed through the unified MCP system. This preserves backward compatibility
+while enabling the benefits of MCP-based tool management.
+"""
 
-# Register MCP server
-await bridge.register_mcp_server("calculator", "python", ["calc.py"])
+import asyncio
+import inspect
+import logging
+from typing import Any, Dict, List, Optional, Sequence
 
-# Execute tools through MessageBus
-result = await bridge.execute_mcp_tool("calculator", "add", {"a": 5, "b": 3})
-```
-
-**Key Features:**
-- Event translation between MCP and LLMgine formats
-- Command routing and execution
-- Lifecycle management for MCP servers
-- Rich monitoring and metrics collection
-
-### 3. MCPServerRegistry (`src/llmgine/llm/tools/mcp_registry.py`)
-
-Advanced server definition and discovery system:
-
-```python
-from llmgine.llm.tools.mcp_registry import MCPServerRegistry, MCPServerDefinition
-
-# Create registry
-registry = MCPServerRegistry()
-
-# Register server definition
-definition = MCPServerDefinition(
-    name="notion",
-    command="python",
-    args=["notion_server.py"],
-    description="Notion integration server",
-    tags=["productivity", "documents"],
-    priority=10
+from mcp.server.models import InitializationOptions
+from mcp.server import NotificationOptions, Server
+from mcp.types import (
+    CallToolRequest, CallToolResult, ListToolsRequest, Tool, TextContent,
+    JSONRPCMessage, RequestT, LoggingLevel, ListToolsResult
 )
 
-registry.register_server(definition)
+# Import tool functions from different parts of LLMgine
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'tests', 'tools'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'tools'))
 
-# Load from configuration file
-registry.load_from_file("mcp_servers.yaml")
+from tools_for_test import get_weather, get_station_list
+from test_tools import get_weather as simple_get_weather
 
-# Discover tools
-tools = await registry.discover_tools()
+class LLMgineLocalToolsServer:
+    """MCP Server that exposes LLMgine's local tools."""
+    
+    def __init__(self):
+        self.server = Server("llmgine-local-tools")
+        
+        # Register local tool functions
+        self.local_tools = {
+            "get_weather": get_weather,  # Real weather from BOM API
+            "get_station_list": get_station_list,  # List available weather stations
+            "simple_get_weather": simple_get_weather,  # Simple demo weather
+        }
+        
+        # Set up MCP handlers
+        self._setup_handlers()
+    
+    def _setup_handlers(self):
+        """Set up MCP protocol handlers."""
+        
+        @self.server.list_tools()
+        async def handle_list_tools() -> list[Tool]:
+            """List all available local tools."""
+            tools = []
+            
+            for tool_name, tool_func in self.local_tools.items():
+                # Generate tool schema from function
+                schema = self._generate_tool_schema(tool_func)
+                
+                tool = Tool(
+                    name=tool_name,
+                    description=schema["function"]["description"],
+                    inputSchema=schema["function"]["parameters"]
+                )
+                tools.append(tool)
+            
+            return tools
+        
+        @self.server.call_tool()
+        async def handle_call_tool(
+            name: str, arguments: Optional[dict[str, Any]] = None
+        ) -> list[TextContent]:
+            """Execute a local tool."""
+            if name not in self.local_tools:
+                raise ValueError(f"Unknown tool: {name}")
+            
+            tool_func = self.local_tools[name]
+            
+            try:
+                # Parse arguments
+                args = arguments or {}
+                
+                # Execute function
+                if asyncio.iscoroutinefunction(tool_func):
+                    result = await tool_func(**args)
+                else:
+                    result = tool_func(**args)
+                
+                # Convert result to string if needed
+                if not isinstance(result, str):
+                    result = str(result)
+                
+                return [TextContent(type="text", text=result)]
+                
+            except Exception as e:
+                logger.error(f"Error executing tool {name}: {e}")
+                return [TextContent(type="text", text=f"Error: {str(e)}")]
 ```
 
 **Key Features:**
-- Configuration file support (YAML/JSON)
-- Server health monitoring
-- Tool discovery and metadata management
-- Advanced filtering and search capabilities
+- **MCP Protocol Compliance**: Implements full MCP server specification
+- **Tool Schema Generation**: Automatically generates OpenAPI schemas from LLMgine functions
+- **Async Support**: Handles both sync and async tool functions
+- **Error Handling**: Robust error handling with detailed logging
+- **Tool Discovery**: Exposes tools through MCP's `tools/list` endpoint
 
-### 4. Enhanced ToolChatEngine (`programs/engines/mcp_tool_chat_engine.py`)
+### 2. **any-mcp as MCP Client** (`src/any_mcp/`)
 
-Updated engine that demonstrates the MCP integration:
+**any-mcp now acts as a unified MCP client** that can connect to multiple MCP servers:
 
 ```python
-from programs.engines.mcp_tool_chat_engine import MCPToolChatEngine
+from any_mcp.managers.manager import MCPManager
+from any_mcp.integration.tool_adapter import LLMgineToolAdapter
 
-# Create engine with MCP support
-engine = MCPToolChatEngine(
-    model="gpt-4o-mini",
-    enable_mcp_servers=True
-)
+class MCPUnifiedToolManager:
+    """
+    Unified MCP-powered ToolManager that replaces the original ToolManager.
+    
+    This manager provides complete backward compatibility while enabling:
+    - Local LLMgine tools via MCP server
+    - Third-party MCP servers (Notion, GitHub, etc.)
+    - Unified tool discovery and execution
+    - Advanced MCP capabilities
+    """
+    
+    def __init__(self, chat_history: Optional["SimpleChatHistory"] = None):
+        """Initialize unified MCP-powered tool manager."""
+        self.chat_history = chat_history
+        
+        # MCP system components
+        self.mcp_manager: Optional[MCPManager] = None
+        self.tool_adapter: Optional[LLMgineToolAdapter] = None
+        self._initialized = False
+        
+        # Legacy compatibility: maintain the same interface
+        self.tools: Dict[str, Callable] = {}  # For backward compatibility
+        self.tool_schemas: List[Dict[str, Any]] = []
+        
+        logger.info("Initialized MCPUnifiedToolManager")
+    
+    async def initialize(self) -> bool:
+        """
+        Initialize the MCP system.
+        
+        Returns:
+            True if initialization successful
+        """
+        if self._initialized:
+            return True
+        
+        try:
+            # Initialize MCP manager and adapter
+            self.mcp_manager = MCPManager()
+            self.tool_adapter = LLMgineToolAdapter(self.mcp_manager)
+            
+            # Start configured MCP servers
+            await self._start_configured_servers()
+            
+            self._initialized = True
+            logger.info("MCP system initialized successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize MCP system: {e}")
+            return False
+    
+    async def _start_configured_servers(self):
+        """Start all available MCP servers from configuration."""
+        config_loader = get_config_loader()
+        available_servers = config_loader.get_available_servers()
+        
+        logger.info(f"Starting {len(available_servers)} available MCP servers")
+        
+        for server_config in available_servers:
+            try:
+                success = await self.mcp_manager.start_mcp(
+                    name=server_config.name,
+                    command=server_config.command,
+                    args=server_config.args,
+                    env=server_config.resolved_env
+                )
+                
+                if success:
+                    logger.info(f"✅ Started MCP server: {server_config.name}")
+                else:
+                    logger.warning(f"❌ Failed to start MCP server: {server_config.name}")
+                    
+            except Exception as e:
+                logger.error(f"Error starting MCP server {server_config.name}: {e}")
+```
 
-# Initialize (automatically registers default MCP servers)
-await engine.initialize()
+**Key Features:**
+- **Unified MCP Client**: Single client that connects to multiple MCP servers
+- **Automatic Server Management**: Starts and manages all configured MCP servers
+- **Tool Discovery**: Automatically discovers tools from all connected servers
+- **Backward Compatibility**: Maintains exact same interface as original ToolManager
 
-# Use normally - MCP tools are automatically available
-result = await engine.handle_command(MCPToolChatEngineCommand(
-    prompt="Calculate 15 * 23 and then search for information about the result"
-))
+### 3. **Configuration System** (`src/llmgine/llm/tools/mcp_config_loader.py`)
+
+**YAML-based configuration** for all MCP servers:
+
+```python
+class MCPServerConfig:
+    """Configuration for an MCP server."""
+    
+    def __init__(
+        self,
+        name: str,
+        command: str,
+        args: List[str],
+        env: Dict[str, str] = None,
+        enabled: bool = True,
+        description: str = "",
+        type: str = "local"
+    ):
+        self.name = name
+        self.command = command
+        self.args = args
+        self.env = env or {}
+        self.enabled = enabled
+        self.description = description
+        self.type = type
+
+def get_config_loader() -> MCPConfigLoader:
+    """Get the MCP configuration loader."""
+    return MCPConfigLoader()
+
+class MCPConfigLoader:
+    """Loads MCP server configurations from YAML files."""
+    
+    def __init__(self, config_path: str = "config/mcp_servers_config.yaml"):
+        self.config_path = config_path
+        self._config = None
+    
+    def get_available_servers(self) -> List[MCPServerConfig]:
+        """Get all available MCP server configurations."""
+        if not self._config:
+            self._load_config()
+        
+        available_servers = []
+        
+        for server_name, server_config in self._config.get("mcp_servers", {}).items():
+            if server_config.get("enabled", False):
+                config = MCPServerConfig(
+                    name=server_name,
+                    command=server_config["command"],
+                    args=server_config["args"],
+                    env=server_config.get("env_vars", {}),
+                    description=server_config.get("description", ""),
+                    type=server_config.get("type", "local")
+                )
+                available_servers.append(config)
+        
+        return available_servers
 ```
 
 ## Getting Started
 
-### 1. Basic Setup
+### 1. **Basic Setup - ToolManager as MCP Server**
 
-Replace your existing ToolManager with MCPToolManager:
+**LLMgine's ToolManager is now an MCP server** that you can start independently:
 
 ```python
-# Before (original ToolManager)
-from llmgine.llm.tools.tool_manager import ToolManager
+# Start LLMgine ToolManager as MCP server
+python mcps/llmgine_local_tools.py
 
-tool_manager = ToolManager(chat_history)
-tool_manager.register_tool(my_function)
-
-# After (MCP ToolManager)
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager
-
-tool_manager = MCPToolManager(chat_history, session_id)
-await tool_manager.initialize()  # Required for MCP functionality
-tool_manager.register_tool(my_function)  # Still works!
+# This exposes LLMgine's tools through MCP protocol:
+# - get_weather
+# - get_station_list  
+# - simple_get_weather
+# - And any other tools you've registered
 ```
 
-### 2. Add MCP Servers
+### 2. **Connect any-mcp as MCP Client**
+
+**any-mcp now connects to LLMgine's ToolManager and other MCP servers**:
 
 ```python
-from llmgine.llm.tools.mcp_tool_manager import MCPServerConfig
+from llmgine.llm.tools import ToolManager, create_mcp_tool_manager
+from llmgine.llm.tools.toolCall import ToolCall
 
-# Define MCP servers
-servers = [
-    MCPServerConfig(
-        name="calculator",
-        command="python",
-        args=["mcps/demo_calculator.py"],
-        env={},
-        auto_start=True
-    ),
-    MCPServerConfig(
-        name="notion",
-        command="python",
-        args=["all_mcp_servers/notion_mcp_server.py"],
-        env={"NOTION_TOKEN": "your_token_here"},
-        auto_start=True
-    )
-]
+# Create unified MCP tool manager
+manager = create_mcp_tool_manager()
 
-# Register servers
-results = await tool_manager.register_mcp_servers(servers)
-print(f"Registered {sum(results.values())}/{len(servers)} servers successfully")
+# Initialize MCP system (connects to all configured servers)
+await manager.initialize()
+
+# Get available tools from ALL connected MCP servers
+tools = await manager.list_available_tools()
+print(f"Available tools: {len(tools)}")
+
+# Execute tools (automatically routed to appropriate MCP server)
+result = await manager.execute_tool_call(tool_call)
 ```
 
-### 3. Use Enhanced Engine
+### 3. **Add External MCP Servers**
+
+**Connect to external MCP servers alongside LLMgine's ToolManager**:
 
 ```python
-from programs.engines.mcp_tool_chat_engine import MCPToolChatEngine
+# Add Notion MCP server
+await manager.add_mcp_server(
+    name="notion",
+    command="npx",
+    args=["@notionhq/notion-mcp-server"],
+    env={"NOTION_TOKEN": "your-token"}
+)
 
-# Create and initialize engine
-engine = MCPToolChatEngine(enable_mcp_servers=True)
-await engine.initialize()
+# Add GitHub MCP server
+await manager.add_mcp_server(
+    name="github",
+    command="npx", 
+    args=["@github/github-mcp-server"],
+    env={"GITHUB_TOKEN": "your-token"}
+)
 
-# Get available tools
-tools_info = await engine.get_available_tools()
-print(f"Available tools: {tools_info}")
-
-# Execute commands (tools are automatically discovered and used)
-result = await engine.handle_command(MCPToolChatEngineCommand(
-    prompt="What's the weather in New York and create a Notion page about it?"
-))
+# Now you have access to:
+# - LLMgine tools (via ToolManager MCP server)
+# - Notion tools (via Notion MCP server)
+# - GitHub tools (via GitHub MCP server)
+# - All through the same unified interface!
 ```
 
 ## Migration Guide
 
-### From Original ToolManager
+### **From Original ToolManager to New Architecture**
 
-The MCPToolManager is designed as a drop-in replacement:
-
-```python
-# Migration helper
-from llmgine.llm.tools.mcp_tool_manager import ToolManagerMigrationHelper
-
-# Automatic migration
-mcp_manager = ToolManagerMigrationHelper.migrate_from_original(
-    original_tool_manager,
-    session_id="my_session"
-)
-
-# Hybrid approach (original tools + MCP servers)
-hybrid_manager = ToolManagerMigrationHelper.create_hybrid_manager(
-    original_tool_manager,
-    mcp_server_configs,
-    session_id="my_session"
-)
-```
-
-### Update Engine Code
-
-Minimal changes required for existing engines:
+**The new architecture is 100% backward compatible** - your existing code continues to work:
 
 ```python
-# Before
+# BEFORE (Original ToolManager)
 from llmgine.llm.tools.tool_manager import ToolManager
 
 class MyEngine:
     def __init__(self):
         self.tool_manager = ToolManager(self.chat_history)
         self.tool_manager.register_tool(my_function)
+    
+    async def execute_tool(self, tool_call):
+        return await self.tool_manager.execute_tool_call(tool_call)
 
-# After
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager
+# AFTER (New MCP Architecture - NO CHANGES REQUIRED!)
+from llmgine.llm.tools import ToolManager  # Same import!
 
 class MyEngine:
     def __init__(self):
-        self.tool_manager = MCPToolManager(self.chat_history, str(self.session_id))
-        self._initialized = False
+        self.tool_manager = ToolManager(self.chat_history)  # Same interface!
+        self.tool_manager.register_tool(my_function)  # Still works!
     
-    async def initialize(self):
-        if not self._initialized:
-            await self.tool_manager.initialize()
-            self.tool_manager.register_tool(my_function)
-            # Optionally add MCP servers
-            await self._register_mcp_servers()
-            self._initialized = True
+    async def execute_tool(self, tool_call):
+        return await self.tool_manager.execute_tool_call(tool_call)  # Same!
+```
+
+**The magic happens automatically:**
+1. **ToolManager import now points to MCPUnifiedToolManager**
+2. **Same interface, same methods, same behavior**
+3. **Plus new MCP capabilities automatically available**
+
+### **New MCP Capabilities (Optional)**
+
+**Add MCP capabilities without changing existing code**:
+
+```python
+# Existing code continues to work
+result = await self.tool_manager.execute_tool_call(tool_call)
+
+# NEW: Add MCP servers for enhanced capabilities
+await self.tool_manager.add_mcp_server(
+    name="notion",
+    command="npx",
+    args=["@notionhq/notion-mcp-server"],
+    env={"NOTION_TOKEN": "your-token"}
+)
+
+# Now you have access to Notion tools + your existing tools!
 ```
 
 ## Configuration
 
-### Configuration Files
+### **MCP Servers Configuration** (`config/mcp_servers_config.yaml`)
 
-Create `mcp_servers.yaml` for server definitions:
+**Configure all MCP servers in one place**:
 
 ```yaml
 mcp_servers:
-  - name: calculator
-    command: python
+  # LLMgine ToolManager as MCP server (always enabled)
+  llmgine-local:
+    type: "local" 
+    command: "python"
+    args: ["mcps/llmgine_local_tools.py"]
+    enabled: true
+    description: "LLMgine's built-in tools wrapped as MCP server"
+    
+  # Calculator demo
+  calculator:
+    type: "local"
+    command: "python" 
     args: ["mcps/demo_calculator.py"]
-    description: "Basic calculator operations"
-    tags: ["math", "utility"]
-    auto_start: true
-    priority: 50
+    enabled: false
+    description: "Simple calculator for demonstration"
+
+  # Official MCP Servers (require installation)
+  
+  # Notion MCP Server
+  notion:
+    type: "npm"
+    command: "npx"
+    args: ["@notionhq/notion-mcp-server"]
+    enabled: false
+    env_vars:
+      NOTION_TOKEN: "${NOTION_API_TOKEN}"  # Set in environment
+    description: "Official Notion MCP server with 18+ tools"
+    install_cmd: "npm install -g @notionhq/notion-mcp-server"
     
-  - name: notion
-    command: python
-    args: ["all_mcp_servers/notion_mcp_server.py"]
-    env:
-      NOTION_TOKEN: "${NOTION_TOKEN}"
-    description: "Notion workspace integration"
-    tags: ["productivity", "documents"]
-    auto_start: true
-    priority: 10
-    python_requirements:
-      - "notion-client>=2.0.0"
+  # GitHub MCP Server  
+  github:
+    type: "npm"
+    command: "npx"
+    args: ["@github/github-mcp-server"]
+    enabled: false
+    env_vars:
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"  # Set in environment
+    description: "Official GitHub MCP server for repository management"
+    install_cmd: "npm install -g @github/github-mcp-server"
     
-  - name: web_search
-    command: python
-    args: ["servers/web_search.py"]
+  # Filesystem MCP Server
+  filesystem:
+    type: "npm" 
+    command: "npx"
+    args: ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+    enabled: false
+    description: "File system operations within allowed directories"
+    install_cmd: "npm install -g @modelcontextprotocol/server-filesystem"
+    
+  # SQLite MCP Server
+  sqlite:
+    type: "npm"
+    command: "npx"
+    args: ["@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+    enabled: false
+    description: "SQLite database operations"
+    install_cmd: "npm install -g @modelcontextprotocol/server-sqlite"
+    
+  # Web Search MCP Server  
+  web-search:
+    type: "npm"
+    command: "npx"
+    args: ["@modelcontextprotocol/server-web-search"]
+    enabled: false
+    env_vars:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"  # Or other search API key
     description: "Web search capabilities"
-    tags: ["search", "web"]
-    auto_start: false  # Manual start
-    priority: 30
-    include_tools: ["search", "summarize"]  # Only these tools
-    exclude_tools: ["admin_search"]  # Exclude this tool
+    install_cmd: "npm install -g @modelcontextprotocol/server-web-search"
+    
+  # Memory MCP Server
+  memory:
+    type: "npm" 
+    command: "npx"
+    args: ["@modelcontextprotocol/server-memory"]
+    enabled: false
+    description: "Persistent memory across conversations"
+    install_cmd: "npm install -g @modelcontextprotocol/server-memory"
+    
+  # Kubernetes MCP Server
+  kubernetes:
+    type: "npm"
+    command: "npx"
+    args: ["@kubernetes/mcp-server-kubernetes"]
+    enabled: false
+    env_vars:
+      KUBECONFIG: "${KUBECONFIG}"
+    description: "Kubernetes cluster management"
+    install_cmd: "npm install -g @kubernetes/mcp-server-kubernetes"
+    
+  # Slack MCP Server
+  slack:
+    type: "npm" 
+    command: "npx"
+    args: ["@slack/mcp-server-slack"]
+    enabled: false
+    env_vars:
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_APP_TOKEN: "${SLACK_APP_TOKEN}"
+    description: "Slack workspace integration"
+    install_cmd: "npm install -g @slack/mcp-server-slack"
 ```
 
-### Environment Variables
+### **Environment Variables**
+
+**Set environment variables for enabled servers**:
 
 ```bash
-# MCP system configuration
-export MCP_LOG_LEVEL=INFO
-export MCP_EXECUTION_TIMEOUT=30
-export MCP_MAX_RETRIES=3
+# LLMgine (no token needed - uses local tools)
+# Already configured and enabled
 
-# Server-specific configuration
-export NOTION_TOKEN=your_notion_token
-export OPENAI_API_KEY=your_openai_key
-```
+# Notion
+export NOTION_API_TOKEN="your-notion-token"
 
-### Registry Configuration
+# GitHub  
+export GITHUB_TOKEN="your-github-token"
 
-```python
-from llmgine.llm.tools.mcp_registry import MCPServerRegistry
+# Web Search
+export BRAVE_API_KEY="your-brave-api-key"
 
-# Create registry with custom config directory
-registry = MCPServerRegistry(config_dir="./my_mcp_config")
+# Slack
+export SLACK_BOT_TOKEN="your-slack-bot-token"
+export SLACK_APP_TOKEN="your-slack-app-token"
 
-# Load all configurations from directory
-loaded_count = registry.load_from_directory()
-
-# Get registry statistics
-stats = registry.get_registry_stats()
-print(f"Loaded {stats['total_servers']} servers with {stats['total_tools']} tools")
+# Kubernetes
+export KUBECONFIG="/path/to/kubeconfig"
 ```
 
 ## Usage Examples
 
-### Example 1: Basic Tool Execution
+### **Example 1: Basic MCP Client Usage**
 
 ```python
 import asyncio
-from llmgine.llm.tools.mcp_tool_manager import MCPToolManager, MCPServerConfig
-from llmgine.llm.context.memory import SimpleChatHistory
+from llmgine.llm.tools import ToolManager, create_mcp_tool_manager
 from llmgine.llm.tools.toolCall import ToolCall
 
-async def basic_example():
-    # Setup
-    chat_history = SimpleChatHistory()
-    tool_manager = MCPToolManager(chat_history, "example_session")
+async def basic_mcp_example():
+    """Basic example of using any-mcp as MCP client."""
     
-    # Initialize
-    await tool_manager.initialize()
+    # Create unified MCP tool manager
+    manager = create_mcp_tool_manager()
     
-    # Register MCP server
-    calculator_config = MCPServerConfig(
-        name="calculator",
-        command="python",
-        args=["mcps/demo_calculator.py"],
-        env={},
-        auto_start=True
-    )
+    # Initialize MCP system (connects to all configured servers)
+    await manager.initialize()
     
-    success = await tool_manager.register_mcp_server(calculator_config)
-    if success:
-        print("Calculator server registered successfully")
+    # List all available tools from ALL connected MCP servers
+    tools = await manager.list_available_tools()
+    print(f"Available tools: {len(tools)}")
     
-    # Execute tool
-    tool_call = ToolCall(
-        id="calc_001",
-        name="add",
-        arguments='{"a": 15, "b": 27}'
-    )
+    for tool in tools:
+        print(f"  - {tool['name']} (from {tool['server']})")
     
-    result = await tool_manager.execute_tool_call(tool_call)
-    print(f"15 + 27 = {result}")
-    
-    # Cleanup
-    await tool_manager.cleanup()
-
-asyncio.run(basic_example())
-```
-
-### Example 2: MessageBus Integration
-
-```python
-import asyncio
-from llmgine.bus.bus import MessageBus
-from llmgine.llm.tools.mcp_bridge_integration import create_llmgine_mcp_integration
-
-async def messagebus_example():
-    # Create and start MessageBus
-    bus = MessageBus()
-    await bus.start()
-    
-    # Create MCP integration
-    mcp_servers = [
-        {
-            "name": "calculator",
-            "command": "python",
-            "args": ["mcps/demo_calculator.py"],
-            "env": {}
-        }
-    ]
-    
-    bridge = await create_llmgine_mcp_integration(
-        bus,
-        "messagebus_session",
-        mcp_servers
-    )
-    
-    # Execute tool through MessageBus
-    result = await bridge.execute_mcp_tool(
-        "calculator",
-        "multiply",
-        {"a": 6, "b": 7}
-    )
-    
-    print(f"6 * 7 = {result['result']}")
-    
-    # Get metrics
-    metrics = await bridge.get_mcp_metrics()
-    print(f"Execution metrics: {metrics}")
-    
-    # Cleanup
-    await bridge.cleanup()
-    await bus.stop()
-
-asyncio.run(messagebus_example())
-```
-
-### Example 3: Complete Engine Integration
-
-```python
-import asyncio
-from programs.engines.mcp_tool_chat_engine import MCPToolChatEngine, MCPToolChatEngineCommand
-from llmgine.llm.tools.mcp_tool_manager import MCPServerConfig
-
-async def engine_example():
-    # Create custom MCP server configurations
-    custom_servers = [
-        MCPServerConfig(
-            name="weather",
-            command="python",
-            args=["servers/weather_server.py"],
-            env={"API_KEY": "your_weather_api_key"},
-            auto_start=True
-        ),
-        MCPServerConfig(
-            name="calculator",
-            command="python", 
-            args=["mcps/demo_calculator.py"],
-            env={},
-            auto_start=True
+    # Execute a tool (automatically routed to appropriate MCP server)
+    if tools:
+        tool_name = tools[0]['name']
+        print(f"\nTesting tool: {tool_name}")
+        
+        tool_call = ToolCall(
+            name=tool_name,
+            arguments={"city": "melbourne"},
+            id="test-1"
         )
-    ]
-    
-    # Create engine with custom servers
-    engine = MCPToolChatEngine(
-        model="gpt-4o-mini",
-        enable_mcp_servers=True,
-        mcp_server_configs=custom_servers
-    )
-    
-    # Initialize
-    await engine.initialize()
-    
-    # Check available tools
-    tools_info = await engine.get_available_tools()
-    print(f"Local tools: {tools_info['local_tools']}")
-    print(f"MCP tools: {len(tools_info['mcp_tools'])}")
-    
-    # Execute command
-    command = MCPToolChatEngineCommand(
-        prompt="What's 25 * 34, and if that's the temperature in Celsius, what is it in Fahrenheit?"
-    )
-    
-    result = await engine.handle_command(command)
-    print(f"Result: {result.result}")
-    
-    # Get execution metrics
-    metrics = await engine.get_metrics()
-    print(f"Performance metrics: {metrics}")
+        
+        result = await manager.execute_tool_call(tool_call)
+        print(f"Result: {result}")
     
     # Cleanup
-    await engine.cleanup()
+    await manager.cleanup()
 
-asyncio.run(engine_example())
+# Run the example
+asyncio.run(basic_mcp_example())
+```
+
+### **Example 2: Adding External MCP Servers**
+
+```python
+import asyncio
+from llmgine.llm.tools import create_mcp_tool_manager
+
+async def external_mcp_example():
+    """Example of adding external MCP servers."""
+    
+    # Create manager
+    manager = create_mcp_tool_manager()
+    await manager.initialize()
+    
+    # Add Notion MCP server
+    success = await manager.add_mcp_server(
+        name="notion",
+        command="npx",
+        args=["@notionhq/notion-mcp-server"],
+        env={"NOTION_TOKEN": "your-token"}
+    )
+    print(f"Added Notion server: {success}")
+    
+    # Add GitHub MCP server
+    success = await manager.add_mcp_server(
+        name="github",
+        command="npx",
+        args=["@github/github-mcp-server"],
+        env={"GITHUB_TOKEN": "your-token"}
+    )
+    print(f"Added GitHub server: {success}")
+    
+    # List all available tools
+    tools = await manager.list_available_tools()
+    print(f"Total available tools: {len(tools)}")
+    
+    # Group tools by server
+    tools_by_server = {}
+    for tool in tools:
+        server = tool.get('server', 'unknown')
+        if server not in tools_by_server:
+            tools_by_server[server] = []
+        tools_by_server[server].append(tool['name'])
+    
+    for server, tool_names in tools_by_server.items():
+        print(f"\n{server}: {len(tool_names)} tools")
+        for tool_name in tool_names[:5]:  # Show first 5
+            print(f"  - {tool_name}")
+        if len(tool_names) > 5:
+            print(f"  ... and {len(tool_names) - 5} more")
+    
+    # Cleanup
+    await manager.cleanup()
+
+# Run the example
+asyncio.run(external_mcp_example())
+```
+
+### **Example 3: Backward Compatibility Demo**
+
+```python
+import asyncio
+from llmgine.llm.tools import ToolManager
+from llmgine.llm.tools.toolCall import ToolCall
+
+async def backward_compatibility_demo():
+    """Demonstrate backward compatibility with existing code."""
+    
+    print("=== Backward Compatibility Demo ===")
+    
+    # This code continues to work exactly as before
+    manager = ToolManager()  # Same interface!
+    
+    # Initialize MCP system (new requirement)
+    await manager.initialize()
+    
+    # Get available tools (same interface as before)
+    tools = manager.parse_tools_to_list()
+    print(f"Available tools: {len(tools)}")
+    
+    for tool in tools:
+        print(f"  - {tool['function']['name']}: {tool['function']['description']}")
+    
+    # Execute a tool call (same interface as before)
+    if tools:
+        tool_name = tools[0]['function']['name']
+        print(f"\nTesting tool: {tool_name}")
+        
+        tool_call = ToolCall(
+            name=tool_name,
+            arguments={"city": "melbourne"},
+            id="test-1"
+        )
+        
+        result = await manager.execute_tool_call(tool_call)
+        print(f"Result: {result}")
+    
+    # Cleanup
+    await manager.cleanup()
+
+# Run the demo
+asyncio.run(backward_compatibility_demo())
 ```
 
 ## Advanced Features
 
-### 1. Event Monitoring
+### **1. Dynamic MCP Server Management**
 
-Monitor tool execution lifecycle:
+**Add and remove MCP servers at runtime**:
 
 ```python
-from llmgine.llm.tools.mcp_bridge_integration import MCPToolExecutionLLMgineEvent
-
-async def tool_execution_handler(event: MCPToolExecutionLLMgineEvent):
-    if event.success:
-        print(f"✅ Tool {event.tool_name} completed in {event.execution_time_ms}ms")
-    else:
-        print(f"❌ Tool {event.tool_name} failed: {event.error_message}")
-
-# Register event handler
-bus.register_event_handler(
-    MCPToolExecutionLLMgineEvent,
-    tool_execution_handler,
-    session_id
-)
+async def dynamic_server_management():
+    """Demonstrate dynamic MCP server management."""
+    
+    manager = create_mcp_tool_manager()
+    await manager.initialize()
+    
+    # Add server dynamically
+    success = await manager.add_mcp_server(
+        name="dynamic_calculator",
+        command="python",
+        args=["mcps/demo_calculator.py"],
+        env={}
+    )
+    
+    if success:
+        print("✅ Dynamic calculator server added")
+        
+        # Check server status
+        servers = await manager.list_mcp_servers()
+        print(f"Active servers: {list(servers.keys())}")
+        
+        # Remove server
+        await manager.remove_mcp_server("dynamic_calculator")
+        print("🗑️  Dynamic calculator server removed")
+    
+    await manager.cleanup()
 ```
 
-### 2. Dynamic Server Management
+### **2. Tool Filtering and Selection**
 
-Add and remove servers at runtime:
+**Control which tools are available from each server**:
 
 ```python
-# Add server dynamically
-new_server_config = MCPServerConfig(
-    name="dynamic_server",
-    command="python",
-    args=["new_server.py"],
-    env={},
-    auto_start=True
-)
-
-success = await tool_manager.register_mcp_server(new_server_config)
-if success:
-    print("Dynamic server added successfully")
-
-# Check server status
-status = await tool_manager.get_mcp_server_status()
-for server_name, server_status in status.items():
-    print(f"{server_name}: {'Active' if server_status['active'] else 'Inactive'}")
+async def tool_filtering_example():
+    """Demonstrate tool filtering capabilities."""
+    
+    manager = create_mcp_tool_manager()
+    await manager.initialize()
+    
+    # Get tools from specific server
+    llmgine_tools = await manager.get_tools_from_server("llmgine-local")
+    print(f"LLMgine tools: {len(llmgine_tools)}")
+    
+    # Get tools by category
+    weather_tools = await manager.get_tools_by_category("weather")
+    print(f"Weather tools: {len(weather_tools)}")
+    
+    # Get tools by tags
+    utility_tools = await manager.get_tools_by_tags(["utility", "math"])
+    print(f"Utility/Math tools: {len(utility_tools)}")
+    
+    await manager.cleanup()
 ```
 
-### 3. Tool Filtering and Selection
+### **3. Health Monitoring and Auto-Recovery**
 
-Control which tools are available:
-
-```python
-# Server definition with tool filtering
-filtered_server = MCPServerDefinition(
-    name="filtered_server",
-    command="python",
-    args=["multi_tool_server.py"],
-    include_tools=["safe_tool1", "safe_tool2"],  # Only these tools
-    exclude_tools=["admin_tool", "dangerous_tool"],  # Exclude these
-    description="Server with filtered tools"
-)
-
-registry.register_server(filtered_server)
-```
-
-### 4. Health Monitoring
-
-Monitor server health and auto-recovery:
+**Monitor server health and implement recovery strategies**:
 
 ```python
-# Check health of all servers
-health_status = await registry.health_check_all()
-
-for server_name, health in health_status.items():
-    if health["status"] == "error":
-        print(f"⚠️  Server {server_name} is unhealthy: {health['error']}")
-        # Implement recovery logic here
-```
-
-### 5. Performance Optimization
-
-Configure performance settings:
-
-```python
-# Configure tool manager for high performance
-tool_manager = MCPToolManager(chat_history, session_id)
-await tool_manager.initialize()
-
-# Set execution timeouts
-tool_manager.execution_timeout = 10  # 10 second timeout
-
-# Configure retry behavior
-tool_manager.max_retries = 2
-tool_manager.retry_delay = 1.0  # 1 second between retries
-
-# Enable performance monitoring
-tool_manager.enable_performance_monitoring = True
+async def health_monitoring_example():
+    """Demonstrate health monitoring capabilities."""
+    
+    manager = create_mcp_tool_manager()
+    await manager.initialize()
+    
+    # Check health of all servers
+    health_status = await manager.check_all_server_health()
+    
+    for server_name, health in health_status.items():
+        status = health['status']
+        if status == 'healthy':
+            print(f"✅ {server_name}: Healthy")
+        elif status == 'warning':
+            print(f"⚠️  {server_name}: Warning - {health.get('message', '')}")
+        else:
+            print(f"❌ {server_name}: Error - {health.get('error', '')}")
+            
+            # Implement recovery logic
+            if health.get('recoverable', False):
+                print(f"🔄 Attempting to recover {server_name}...")
+                success = await manager.recover_server(server_name)
+                if success:
+                    print(f"✅ {server_name} recovered successfully")
+                else:
+                    print(f"❌ Failed to recover {server_name}")
+    
+    await manager.cleanup()
 ```
 
 ## Troubleshooting
 
-### Common Issues
+### **Common Issues**
 
-#### 1. MCP Server Connection Failures
+#### **1. MCP Server Connection Failures**
 
 ```python
 # Check server status
-status = await tool_manager.get_mcp_server_status()
-for server_name, info in status.items():
-    if not info["active"]:
-        print(f"Server {server_name} is not active")
-        # Check configuration
-        config = info["config"]
-        print(f"Command: {config.command} {' '.join(config.args)}")
+servers = await manager.list_mcp_servers()
+for server_name, status in servers.items():
+    if not status['active']:
+        print(f"❌ Server {server_name} is not active")
+        print(f"   Error: {status.get('error', 'Unknown error')}")
+        print(f"   Command: {status.get('command', 'Unknown')}")
 ```
 
 **Solutions:**
@@ -629,121 +852,129 @@ for server_name, info in status.items():
 - Review server logs for error messages
 - Ensure required environment variables are set
 
-#### 2. Tool Discovery Issues
+#### **2. Tool Discovery Issues**
 
 ```python
 # Debug tool discovery
-mcp_tools = await tool_manager.discover_mcp_tools()
-if not mcp_tools:
-    print("No MCP tools discovered")
-    # Check server connection
-    # Verify server implements MCP protocol correctly
+tools = await manager.list_available_tools()
+if not tools:
+    print("❌ No tools discovered")
+    
+    # Check server connections
+    servers = await manager.list_mcp_servers()
+    print(f"Connected servers: {list(servers.keys())}")
+    
+    # Test individual server tool discovery
+    for server_name in servers.keys():
+        server_tools = await manager.get_tools_from_server(server_name)
+        print(f"Tools from {server_name}: {len(server_tools)}")
 ```
 
 **Solutions:**
-- Ensure MCP servers implement the `tools/list` endpoint
+- Ensure MCP servers implement the `tools/list` endpoint correctly
 - Check server response format matches MCP specification
 - Verify network connectivity to MCP servers
 
-#### 3. Event System Integration
+#### **3. Backward Compatibility Issues**
 
 ```python
-# Debug event flow
-import logging
-logging.getLogger('llmgine.llm.tools.mcp_bridge_integration').setLevel(logging.DEBUG)
-
-# Check event handler registration
-handlers = bus._registry.get_event_handlers(MCPToolExecutionLLMgineEvent, session_id)
-print(f"Registered handlers: {len(handlers)}")
+# Verify backward compatibility
+try:
+    # Test original ToolManager interface
+    tools = manager.parse_tools_to_list()
+    print(f"✅ Backward compatibility: {len(tools)} tools found")
+except Exception as e:
+    print(f"❌ Backward compatibility issue: {e}")
 ```
 
 **Solutions:**
-- Verify event handlers are registered with correct session ID
-- Check event type matching
-- Ensure MessageBus is properly initialized
+- Ensure you're importing from `llmgine.llm.tools` (not old paths)
+- Check that `ToolManager` class implements all original methods
+- Verify tool registration still works as expected
 
-### Debug Mode
+### **Debug Mode**
 
-Enable comprehensive debugging:
+**Enable comprehensive debugging**:
 
 ```python
 import logging
 
 # Enable debug logging for MCP components
-logging.getLogger('llmgine.llm.tools.mcp_tool_manager').setLevel(logging.DEBUG)
-logging.getLogger('llmgine.llm.tools.mcp_bridge_integration').setLevel(logging.DEBUG)
+logging.getLogger('llmgine.llm.tools.mcp_unified_tool_manager').setLevel(logging.DEBUG)
 logging.getLogger('any_mcp').setLevel(logging.DEBUG)
 
 # Create tool manager with debug info
-tool_manager = MCPToolManager(chat_history, session_id)
-tool_manager.debug_mode = True
-await tool_manager.initialize()
+manager = create_mcp_tool_manager()
+manager.debug_mode = True
+await manager.initialize()
 ```
 
-### Diagnostic Commands
+### **Diagnostic Commands**
 
 ```python
-# Get comprehensive diagnostic information
-async def run_diagnostics(tool_manager):
+async def run_diagnostics(manager):
+    """Run comprehensive diagnostics."""
+    
     print("=== MCP Integration Diagnostics ===")
     
     # 1. Check initialization
-    print(f"Initialized: {tool_manager._initialized}")
+    print(f"Initialized: {manager._initialized}")
     
-    # 2. Check local tools
-    print(f"Local tools: {list(tool_manager.local_tools.keys())}")
+    # 2. Check MCP manager
+    print(f"MCP Manager: {'Active' if manager.mcp_manager else 'Inactive'}")
     
-    # 3. Check MCP servers
-    server_status = await tool_manager.get_mcp_server_status()
-    print(f"MCP servers: {server_status}")
+    # 3. Check connected servers
+    servers = await manager.list_mcp_servers()
+    print(f"Connected MCP servers: {list(servers.keys())}")
     
-    # 4. Check discovered tools
-    mcp_tools = await tool_manager.discover_mcp_tools()
-    print(f"MCP tools: {len(mcp_tools)}")
+    # 4. Check available tools
+    tools = await manager.list_available_tools()
+    print(f"Total available tools: {len(tools)}")
     
     # 5. Check tool schemas
-    print(f"Total tool schemas: {len(tool_manager.tool_schemas)}")
+    print(f"Tool schemas: {len(manager.tool_schemas)}")
     
     # 6. Test basic functionality
     try:
-        # Test local tool if available
-        if tool_manager.local_tools:
-            tool_name = list(tool_manager.local_tools.keys())[0]
+        if tools:
+            tool_name = tools[0]['name']
             test_call = ToolCall(id="test", name=tool_name, arguments="{}")
-            result = await tool_manager.execute_tool_call(test_call)
-            print(f"Local tool test: {result}")
+            result = await manager.execute_tool_call(test_call)
+            print(f"✅ Tool execution test: {result}")
     except Exception as e:
-        print(f"Local tool test failed: {e}")
+        print(f"❌ Tool execution test failed: {e}")
 
-await run_diagnostics(tool_manager)
+# Run diagnostics
+await run_diagnostics(manager)
 ```
 
 ## Performance Considerations
 
-### Optimization Guidelines
+### **Optimization Guidelines**
 
 1. **Server Startup**: Use `auto_start=False` for servers that aren't immediately needed
-2. **Tool Filtering**: Use `include_tools`/`exclude_tools` to limit available tools
-3. **Connection Pooling**: Reuse MCP connections when possible
-4. **Caching**: Cache tool schemas and discovery results
-5. **Async Execution**: Use concurrent tool execution for independent operations
+2. **Connection Pooling**: Reuse MCP connections when possible
+3. **Tool Caching**: Cache tool schemas and discovery results
+4. **Async Execution**: Use concurrent tool execution for independent operations
+5. **Health Monitoring**: Implement proactive health checks to prevent failures
 
-### Performance Monitoring
+### **Performance Monitoring**
 
 ```python
-# Monitor execution performance
-async def monitor_performance(tool_manager):
+async def monitor_performance(manager):
+    """Monitor MCP system performance."""
+    
     import time
     
     start_time = time.time()
     
-    # Execute multiple tools
+    # Execute multiple tools concurrently
     tool_calls = [
         ToolCall(id=f"perf_test_{i}", name="add", arguments=f'{{"a": {i}, "b": {i+1}}}')
         for i in range(10)
     ]
     
-    results = await tool_manager.execute_tool_calls(tool_calls)
+    results = await manager.execute_tool_calls(tool_calls)
     
     end_time = time.time()
     total_time = end_time - start_time
@@ -754,53 +985,61 @@ async def monitor_performance(tool_manager):
     return results
 
 # Run performance test
-await monitor_performance(tool_manager)
+await monitor_performance(manager)
 ```
 
-### Memory Management
+### **Memory Management**
 
 ```python
-# Cleanup resources properly
 async def cleanup_example():
+    """Demonstrate proper cleanup."""
+    
     try:
         # Use tool manager
-        await tool_manager.execute_tool_calls(tool_calls)
+        manager = create_mcp_tool_manager()
+        await manager.initialize()
+        
+        # Execute tools
+        result = await manager.execute_tool_call(tool_call)
+        
     finally:
         # Always cleanup
-        await tool_manager.cleanup()
-        if bridge:
-            await bridge.cleanup()
-        await bus.stop()
+        if 'manager' in locals():
+            await manager.cleanup()
 ```
 
 ## API Reference
 
-### MCPToolManager
+### **MCPUnifiedToolManager**
 
-#### Constructor
+#### **Constructor**
 ```python
-MCPToolManager(chat_history: Optional[SimpleChatHistory] = None, session_id: Optional[str] = None)
+MCPUnifiedToolManager(chat_history: Optional[SimpleChatHistory] = None)
 ```
 
-#### Key Methods
+#### **Key Methods**
 ```python
 # Initialization
-await initialize() -> None
+await initialize() -> bool
 
-# Tool registration (backwards compatibility)
-register_tool(func: AsyncOrSyncToolFunction) -> None
-
-# MCP server management
-await register_mcp_server(config: MCPServerConfig) -> bool
-await register_mcp_servers(configs: List[MCPServerConfig]) -> Dict[str, bool]
-
-# Tool execution (same interface as original)
+# Tool execution (same interface as original ToolManager)
 await execute_tool_call(tool_call: ToolCall) -> Any
 await execute_tool_calls(tool_calls: List[ToolCall]) -> List[Any]
 
-# Discovery and status
-await discover_mcp_tools() -> List[Dict[str, Any]]
-await get_mcp_server_status() -> Dict[str, Any]
+# MCP server management
+await add_mcp_server(name: str, command: str, args: List[str], env: Optional[Dict[str, str]] = None) -> bool
+await remove_mcp_server(name: str) -> bool
+await list_mcp_servers() -> Dict[str, bool]
+
+# Tool discovery
+await list_available_tools() -> List[Dict[str, Any]]
+await get_tools_from_server(server_name: str) -> List[Dict[str, Any]]
+await get_tools_by_category(category: str) -> List[Dict[str, Any]]
+await get_tools_by_tags(tags: List[str]) -> List[Dict[str, Any]]
+
+# Health monitoring
+await check_all_server_health() -> Dict[str, Dict[str, Any]]
+await recover_server(server_name: str) -> bool
 
 # Properties
 tool_schemas: List[Dict[str, Any]]  # All tool schemas (local + MCP)
@@ -810,92 +1049,42 @@ chat_history_to_messages() -> List[Dict[str, Any]]
 await cleanup() -> None
 ```
 
-### LLMgineMCPBridge
+### **Factory Functions**
 
-#### Constructor
 ```python
-LLMgineMCPBridge(llmgine_bus: MessageBus, session_id: Optional[Union[str, SessionID]] = None)
-```
+# Create MCP-powered ToolManager
+from llmgine.llm.tools import create_mcp_tool_manager
 
-#### Key Methods
-```python
-# Initialization
-await initialize() -> bool
+manager = create_mcp_tool_manager(chat_history)
+await manager.initialize()
 
-# High-level interface
-await register_mcp_server(name: str, command: str, args: list, env: Dict[str, str] = None) -> bool
-await execute_mcp_tool(mcp_name: str, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]
+# Backward compatibility - same interface
+from llmgine.llm.tools import ToolManager
 
-# Information and monitoring
-await get_available_tools() -> List[Dict[str, Any]]
-await get_mcp_metrics() -> Dict[str, Any]
-await get_server_status() -> Dict[str, Any]
-
-# Cleanup
-await cleanup() -> None
-```
-
-### MCPServerRegistry
-
-#### Constructor
-```python
-MCPServerRegistry(config_dir: Optional[Union[str, Path]] = None)
-```
-
-#### Key Methods
-```python
-# Server definition management
-register_server(definition: MCPServerDefinition) -> bool
-unregister_server(name: str) -> bool
-get_server_definition(name: str) -> Optional[MCPServerDefinition]
-list_servers(tags: Optional[List[str]] = None, status: Optional[str] = None) -> List[MCPServerDefinition]
-
-# Configuration file management
-load_from_file(file_path: Union[str, Path]) -> int
-load_from_directory(directory: Optional[Union[str, Path]] = None) -> int
-save_to_file(file_path: Union[str, Path], servers: Optional[List[str]] = None) -> None
-
-# Tool discovery
-await discover_tools(server_names: Optional[List[str]] = None) -> Dict[str, List[MCPToolInfo]]
-get_tool_info(tool_name: str, server_name: Optional[str] = None) -> Optional[MCPToolInfo]
-list_tools(server_name: Optional[str] = None, category: Optional[str] = None, tags: Optional[List[str]] = None) -> List[MCPToolInfo]
-
-# Health monitoring
-await check_server_health(server_name: str) -> Dict[str, Any]
-await health_check_all() -> Dict[str, Dict[str, Any]]
-
-# Utilities
-get_registry_stats() -> Dict[str, Any]
-export_tool_schemas(output_format: str = "openai") -> List[Dict[str, Any]]
-```
-
-### Events and Commands
-
-#### Events
-```python
-# LLMgine events for MCP integration
-MCPToolRegisteredLLMgineEvent(mcp_name: str, tool_name: str, tool_schema: Dict[str, Any], ...)
-MCPToolExecutionLLMgineEvent(mcp_name: str, tool_name: str, success: bool, result: Any, ...)
-```
-
-#### Commands
-```python
-# LLMgine commands for MCP integration
-ExecuteMCPToolLLMgineCommand(mcp_name: str, tool_name: str, tool_arguments: Dict[str, Any], ...)
-RegisterMCPServerCommand(mcp_name: str, command: str, args: list, env: Dict[str, str], ...)
+manager = ToolManager(chat_history)  # Now points to MCPUnifiedToolManager
+await manager.initialize()
 ```
 
 ---
 
 ## Conclusion
 
-The LLMgine-MCP integration provides a powerful, flexible, and backwards-compatible way to enhance your LLM applications with external tool capabilities. The system is designed to be:
+The **revolutionary new LLMgine-MCP architecture** transforms the traditional approach by:
 
-- **Easy to adopt**: Drop-in replacement for existing ToolManager
-- **Powerful**: Advanced features like dynamic discovery and health monitoring  
-- **Flexible**: Support for both local functions and external MCP servers
-- **Production-ready**: Comprehensive error handling, logging, and monitoring
+- **🔄 Making ToolManager an MCP Server**: LLMgine's tools are now available through the MCP protocol
+- **🔌 Using any-mcp as MCP Client**: Single client that connects to multiple MCP servers simultaneously
+- **🌐 Enabling Universal Access**: Any MCP-compliant client can use LLMgine's tools
+- **🚀 Providing Scalability**: Easy to add new MCP servers without changing the client architecture
+- **🔄 Maintaining Backward Compatibility**: Existing code continues to work unchanged
 
-For additional support, examples, and advanced use cases, refer to the source code and test files in the repository.
+This architecture creates a **unified, scalable, and extensible system** that leverages the best of both worlds:
+
+- **LLMgine's robust tool ecosystem** (now available as MCP server)
+- **any-mcp's powerful MCP client capabilities** (connects to multiple servers)
+- **Official MCP server ecosystem** (Notion, GitHub, Filesystem, etc.)
+
+The result is a **modern, professional-grade MCP integration** that maintains 100% backward compatibility while opening up a world of new possibilities through the MCP ecosystem.
 
 **Repository**: [https://github.com/chi-n-nguyen/llmgine-mcp-integration](https://github.com/chi-n-nguyen/llmgine-mcp-integration)
+
+**any-mcp Repository**: [https://github.com/chi-n-nguyen/any-mcp](https://github.com/chi-n-nguyen/any-mcp)

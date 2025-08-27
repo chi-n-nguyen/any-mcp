@@ -123,7 +123,7 @@ async def main():
     print("          name='search_pages',")
     print("          arguments={")
     print("              'query': 'meeting notes',")
-    print("              'filter': {'property': 'object', 'value': 'page'}")
+    print("              'filter': {'property': 'object', 'value': 'page'}}")
     print("          }")
     print("      )")
     print("  )")

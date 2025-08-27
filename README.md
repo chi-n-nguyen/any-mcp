@@ -8,7 +8,6 @@ A comprehensive framework for integrating MCP (Model Context Protocol) servers w
 
 - **18+ Notion tools** - Create, read, update, delete pages, databases, blocks
 - **Calculator tools** - Math operations, scientific functions
-- **Discord integration** - Message handling, bot management
 - **Extensible framework** - Add any MCP server with one line
 
 ## Project Structure
@@ -16,16 +15,19 @@ A comprehensive framework for integrating MCP (Model Context Protocol) servers w
 ```
 mcp/
 ├── demos/                    # Working examples
-│   ├── notion/             # Notion MCP integration demos
+│   ├── notion/             # Notion MCP integration demos  
 │   ├── tools/              # MCP tool combination examples
-│   └── integration/        # Advanced integration patterns
+│   ├── mcp_integration_demo.py # Comprehensive MCP demo
+│   └── mcp_unified_demo.py    # Unified demo script
 ├── src/                     # Core MCP integration code
 │   ├── any_mcp/            # MCP client and adapter implementations
 │   └── llmgine/            # LLMgine integration layer
 ├── mcps/                    # MCP server examples
+├── programs/                # Example applications
+│   └── engines/            # Enhanced engine implementations
 ├── config/                  # Configuration files
 ├── docs/                    # Documentation
-└── tests/                   # Test suite
+└── tests/                   # Comprehensive test suite
 ```
 
 ## Quick Start
@@ -67,6 +69,11 @@ uv pip install -e ".[dev]"
 - **`test_real_notion.py`** - Test with your actual Notion workspace
 - **`notion_mcp_demo.py`** - See 18+ tools automatically available
 - **`real_notion_mcp_demo.py`** - Full integration example
+
+### **Comprehensive Demos** (`demos/`)
+
+- **`mcp_integration_demo.py`** - Complete MCP integration demonstration
+- **`mcp_unified_demo.py`** - Unified MCP and LLMgine demo
 
 ### **Tool Examples** (`demos/tools/`)
 - **`hybrid_tool_demo.py`** - Combine MCP + local tools

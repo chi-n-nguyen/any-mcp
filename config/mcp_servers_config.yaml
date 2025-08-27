@@ -1,0 +1,113 @@
+# MCP Servers Configuration
+# 
+# This file defines available MCP servers that can be integrated with LLMgine.
+# Servers from https://github.com/modelcontextprotocol/servers
+
+mcp_servers:
+  # Local LLMgine tools (always enabled)
+  llmgine-local:
+    type: "local" 
+    command: "python"
+    args: ["mcps/llmgine_local_tools.py"]
+    enabled: true
+    description: "LLMgine's built-in tools wrapped as MCP server"
+    
+  # Calculator demo
+  calculator:
+    type: "local"
+    command: "python" 
+    args: ["mcps/demo_calculator.py"]
+    enabled: false
+    description: "Simple calculator for demonstration"
+
+  # Official MCP Servers (require installation)
+  
+  # Notion MCP Server
+  notion:
+    type: "npm"
+    command: "npx"
+    args: ["@notionhq/notion-mcp-server"]
+    enabled: false
+    env_vars:
+      NOTION_TOKEN: "${NOTION_API_TOKEN}"  # Set in environment
+    description: "Official Notion MCP server with 18+ tools"
+    install_cmd: "npm install -g @notionhq/notion-mcp-server"
+    
+  # GitHub MCP Server  
+  github:
+    type: "npm"
+    command: "npx"
+    args: ["@github/github-mcp-server"]
+    enabled: false
+    env_vars:
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"  # Set in environment
+    description: "Official GitHub MCP server for repository management"
+    install_cmd: "npm install -g @github/github-mcp-server"
+    
+  # Filesystem MCP Server
+  filesystem:
+    type: "npm" 
+    command: "npx"
+    args: ["@modelcontextprotocol/server-filesystem", "/path/to/allowed/directory"]
+    enabled: false
+    description: "File system operations within allowed directories"
+    install_cmd: "npm install -g @modelcontextprotocol/server-filesystem"
+    
+  # SQLite MCP Server
+  sqlite:
+    type: "npm"
+    command: "npx" 
+    args: ["@modelcontextprotocol/server-sqlite", "/path/to/database.db"]
+    enabled: false
+    description: "SQLite database operations"
+    install_cmd: "npm install -g @modelcontextprotocol/server-sqlite"
+    
+  # Web Search MCP Server  
+  web-search:
+    type: "npm"
+    command: "npx"
+    args: ["@modelcontextprotocol/server-web-search"]
+    enabled: false
+    env_vars:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"  # Or other search API key
+    description: "Web search capabilities"
+    install_cmd: "npm install -g @modelcontextprotocol/server-web-search"
+    
+  # Memory MCP Server
+  memory:
+    type: "npm"
+    command: "npx" 
+    args: ["@modelcontextprotocol/server-memory"]
+    enabled: false
+    description: "Persistent memory across conversations"
+    install_cmd: "npm install -g @modelcontextprotocol/server-memory"
+    
+  # Kubernetes MCP Server
+  kubernetes:
+    type: "npm"
+    command: "npx"
+    args: ["@kubernetes/mcp-server-kubernetes"]
+    enabled: false
+    env_vars:
+      KUBECONFIG: "${KUBECONFIG}"
+    description: "Kubernetes cluster management"
+    install_cmd: "npm install -g @kubernetes/mcp-server-kubernetes"
+    
+  # Slack MCP Server
+  slack:
+    type: "npm" 
+    command: "npx"
+    args: ["@slack/mcp-server-slack"]
+    enabled: false
+    env_vars:
+      SLACK_BOT_TOKEN: "${SLACK_BOT_TOKEN}"
+      SLACK_APP_TOKEN: "${SLACK_APP_TOKEN}"
+    description: "Slack workspace integration"
+    install_cmd: "npm install -g @slack/mcp-server-slack"
+
+# Default configuration
+defaults:
+  auto_start_enabled: true
+  health_check_interval: 60  # seconds
+  max_reconnect_attempts: 3
+  timeout_seconds: 30

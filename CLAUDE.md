@@ -145,7 +145,6 @@ python3 -m any_mcp.cli.main chat
 
 ### Available MCP Servers
 - **Notion** - Document and database management
-- **Discord** - Bot and message handling
 - **Calculator** - Math operations and functions
 - **Custom** - Any MCP-compliant server
 

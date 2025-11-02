@@ -145,10 +145,6 @@ pytest tests/unit/
 - **Development setup** - Environment configuration and testing
 - **Architecture overview** - Core components and integration patterns
 
-## License
-
-MIT License - see [LICENSE](LICENSE) for details.
-
 ---
 
 **Unified MCP integration for LLMgine - one interface for all tools!**
